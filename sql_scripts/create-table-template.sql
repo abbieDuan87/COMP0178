@@ -53,15 +53,15 @@ VALUES
     ('Others');
 
 CREATE TABLE Auctions (
-    auctionID INT NOT NULL PRIMARY KEY AUTO_INCREMENT, -- Fix: changed 'PRIMARY' to 'PRIMARY KEY'
+    auctionID INT NOT NULL PRIMARY KEY AUTO_INCREMENT, 
     categoryID INT NOT NULL,
     sellerID INT NOT NULL,
     title VARCHAR(255) NOT NULL,
-    description VARCHAR(255), -- You can decide if this should be NOT NULL
-    createdDate DATETIME NOT NULL, -- Use PHP to set the date, or set default CURRENT_TIMESTAMP
+    description VARCHAR(255), 
+    createdDate DATETIME NOT NULL, 
     endDate DATETIME NOT NULL,
     startingPrice FLOAT NOT NULL,
-    reservePrice FLOAT, -- Correct spelling from 'reversePrice' to 'reservePrice'
+    reservePrice FLOAT,
     itemImage BINARY,
     auctionStatus BOOLEAN NOT NULL,
     itemCondition ENUM('new', 'good', 'used') NOT NULL,
