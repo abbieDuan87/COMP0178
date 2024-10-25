@@ -36,7 +36,7 @@ CREATE TABLE Addresses(
 
 CREATE TABLE Categories (
     categoryID INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(30) NOT NULL
+    name VARCHAR(40) NOT NULL
 );
 
 INSERT INTO Categories (name)
