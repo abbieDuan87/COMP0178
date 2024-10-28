@@ -34,7 +34,7 @@ function print_listing_li($item_id, $title, $desc, $price, $num_bids, $end_time)
   }
   
   // Fix language of bid vs. bids
-  if ($num_bids == 1) {
+  if ($num_bids <= 1) {
     $bid = ' bid';
   }
   else {
