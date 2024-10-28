@@ -1,9 +1,9 @@
-# Drop the database if exists
+-- Drop the database if exists
 DROP DATABASE IF EXISTS auction;
 CREATE DATABASE auction;
 USE auction;
 
-# Create the tables
+-- Create the tables
 CREATE TABLE Users(  
     userID INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
     firstName VARCHAR(255) NOT NULL,
@@ -12,7 +12,6 @@ CREATE TABLE Users(
     password VARCHAR(255) NOT NULL,
     dateOfBirth DATETIME
 ) COMMENT '';
-
 
 CREATE TABLE Sellers(
     sellerID INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
