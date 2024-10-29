@@ -71,7 +71,7 @@ $connection = get_connection();
 <?php
 // Retrieve these from the URL
 $keyword = isset($_GET['keyword']) ? $_GET['keyword'] : "";
-$category = isset($_GET['cat']) ? $_GET['cat'] : 0;
+$category = isset($_GET['cat']) ? $_GET['cat'] : "0";
 $ordering = isset($_GET['order_by']) ? $_GET['order_by'] : "pricelow";
 $curr_page = isset($_GET['page']) ? $_GET['page'] : 1;
 
@@ -84,7 +84,7 @@ $auction_list_sql = "SELECT auctions.*, COUNT(bids.bidID) AS bidCount
         LEFT JOIN bids ON auctions.auctionID = bids.auctionID ";
 
 // WHERE must before ORDER BY
-if ($category != 0) {
+if ($category != "0") {
   $auction_list_sql .= "WHERE auctions.categoryID = {$category} ";
 }
 
