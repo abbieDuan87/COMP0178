@@ -74,7 +74,7 @@ $connection = get_connection();
 $keyword = isset($_GET['keyword']) ? $_GET['keyword'] : "";
 $category = isset($_GET['cat']) ? $_GET['cat'] : "0";
 $ordering = isset($_GET['order_by']) ? $_GET['order_by'] : "pricelow";
-$curr_page = isset($_GET['page']) ? $_GET['page'] : 1;
+$curr_page = isset($_GET['page']) & !empty($_GET['page'])? $_GET['page'] : 1;
 $active_only = isset($_GET['active_only']) ? $_GET['active_only'] : ""; 
 
 // Base query
@@ -99,7 +99,7 @@ if ($category != "0") {
 // keyword filter - Search
 if (!empty($keyword)) {
   $filters[] = "(auctions.title LIKE ? OR auctions.description LIKE ?)";
-  $keyword_param = "%" . $keyword . "%";
+  $keyword_param = "%" . sanitise_user_input($keyword) . "%";
   $params[] = $keyword_param;
   $params[] = $keyword_param;
   $types .= "ss"; // string 

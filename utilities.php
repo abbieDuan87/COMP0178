@@ -120,3 +120,10 @@ function pagination($curr_page, $max_page)
 </li>');
   }
 }
+
+function sanitise_user_input($data) {
+  $data = trim($data);
+  $data = htmlspecialchars($data);
+  $data = str_replace(['%', '_'], ['\\%', '\\_'], $data);
+  return $data;
+}
