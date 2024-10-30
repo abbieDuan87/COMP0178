@@ -79,7 +79,8 @@ $curr_page = isset($_GET['page']) ? $_GET['page'] : 1;
      retrieve data from the database. (If there is no form data entered,
      decide on appropriate default value/default query to make. */
 
-$auction_list_sql = "SELECT auctions.*, COUNT(bids.bidID) AS bidCount
+$auction_list_sql = "SELECT auctions.*, COUNT(bids.bidID) AS bidCount,
+        COALESCE(MAX(bids.bidPrice), auctions.startingPrice) AS currentPrice
         FROM auctions
         LEFT JOIN bids ON auctions.auctionID = bids.auctionID ";
 
@@ -93,9 +94,9 @@ $auction_list_sql .= "GROUP BY auctions.auctionID ";
 
 // ORDER BY
 if ($ordering == 'pricehigh') {
-  $auction_list_sql .= "ORDER BY startingPrice DESC ";
+  $auction_list_sql .= "ORDER BY currentPrice DESC ";
 } else if ($ordering == 'pricelow') {
-  $auction_list_sql .= "ORDER BY startingPrice ";
+  $auction_list_sql .= "ORDER BY currentPrice ";
 } else if ($ordering == 'date') {
   $auction_list_sql .= "ORDER BY endDate ";
 }
@@ -131,6 +132,7 @@ $max_page = ceil($num_results / $results_per_page);
         $row['title'],
         $row['description'],
         $row['startingPrice'],
+        $row['currentPrice'],
         $row['bidCount'],
         new DateTime($row['endDate'])
       );
