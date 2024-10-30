@@ -24,3 +24,25 @@ function close_connection($connection)
 {
     mysqli_close($connection);
 }
+
+function execute_prepared_stmt_query($connection, $sql, $params = [], $types = "") {
+    $stmt = mysqli_prepare($connection, $sql);
+    if (!$stmt) {
+        die("Statement preparation failed: " . mysqli_error($connection));
+    }
+
+    if (!empty($params)) {
+        mysqli_stmt_bind_param($stmt, $types, ...$params);
+    }
+    
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+
+    // Check for errors
+    if (!$result) {
+        die("Error executing query: " . mysqli_error($connection));
+    }
+
+    mysqli_stmt_close($stmt);
+    return $result;
+}
