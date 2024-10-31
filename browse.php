@@ -105,7 +105,7 @@ if (!empty($keyword)) {
   $types .= "ss"; // string 
 }
 
-if (!empty($active_only)) {
+if (!empty($active_only) && $active_only == "1") {
   $filters[] = "(endDate >= NOW() AND auctionStatus = TRUE)";
 }
 
