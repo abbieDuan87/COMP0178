@@ -4,45 +4,46 @@ session_start();
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
-    $accountType = $_POST["accountType"];
-    $firstName = $_POST["firstName"];
-    $lastName = $_POST["lastName"];
+    $account_type = $_POST["accountType"];
+    $first_name = $_POST["firstName"];
+    $last_name = $_POST["lastName"];
+    $username = $_POST["username"];
     $email = $_POST["email"];
     $password = $_POST["password"];
-    $passwordConfirmation = $_POST["passwordConfirmation"];
+    $password_confirmation = $_POST["passwordConfirmation"];
 
     $errorMessage = '';
-    if (empty($firstName) || empty($lastName) || empty($email) || empty($password) || empty($passwordConfirmation)) {
-        $errorMessage = "Please fill all required fields.";
+    if (empty($first_name) || empty($last_name) || empty($username) || empty($email) || empty($password) || empty($password_confirmation)) {
+        $error_message = "Please fill all required fields.";
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $errorMessage = "Please enter a valid email address.";
+        $error_message = "Please enter a valid email address.";
     } elseif (strlen($password) < 6) {
-        $errorMessage = "Password must be at least 6 characters long.";
-    } elseif ($password !== $passwordConfirmation) {
-        $errorMessage = "Passwords do not match.";
+        $error_message = "Password must be at least 6 characters long.";
+    } elseif ($password !== $password_confirmation) {
+        $error_message = "Passwords do not match.";
     }
 
-    if (!empty($errorMessage)) {
-        $_SESSION['error_message'] = $errorMessage;
+    if (!empty($error_message)) {
+        $_SESSION['error_message'] = $error_message;
         header("Location: register.php");
         exit();
     }
 
-    $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+    $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
     $conn = get_connection();
-    $userSql = "INSERT INTO users (firstName, lastName, email, password) VALUES ('$firstName', '$lastName', '$email', '$hashedPassword')";
+    $user_sql = "INSERT INTO users (firstName, lastName, email, username, password) VALUES ('$first_name', '$last_name', '$email', '$username', '$hashed_password')";
 
-    if (execute_query($conn, $userSql)) {
+    if (execute_query($conn, $user_sql)) {
 
-        $userId = mysqli_insert_id($conn);
+        $user_id = mysqli_insert_id($conn);
 
         if ($accountType === "seller") {
-            $sellerSql = "INSERT INTO sellers (sellerID) VALUES ('$userId')";
+            $seller_sql = "INSERT INTO sellers (sellerID) VALUES ('$user_id')";
             execute_query($conn, $sellerSql);
         } else {
-            $buyerSql = "INSERT INTO buyers (buyerID) VALUES ('$userId')";
-            execute_query($conn, $buyerSql);
+            $buyer_sql = "INSERT INTO buyers (buyerID) VALUES ('$user_id')";
+            execute_query($conn, $buyer_sql);
         }
 
         header("Location: successful_registration.php");

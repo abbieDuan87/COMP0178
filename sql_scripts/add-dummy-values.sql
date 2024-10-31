@@ -1,10 +1,10 @@
 -- Insert into Users
-INSERT INTO Users (firstName, lastName, email, password, dateOfBirth)
+INSERT INTO Users (firstName, lastName, email, username, password)
 VALUES 
-    ('John', 'Doe', 'john.doe@example.com', 'password123', '1980-05-12 00:00:00'),
-    ('Jane', 'Smith', 'jane.smith@example.com', 'password456', '1990-07-19 00:00:00'),
-    ('Tom', 'Brown', 'tom.brown@example.com', 'password789', '1985-03-22 00:00:00'),
-    ('Lucy', 'Johnson', 'lucy.johnson@example.com', 'password101', '1995-11-08 00:00:00');
+('John', 'Doe', 'john.doe@example.com', 'johndoe', 'password123'),
+('Jane', 'Smith', 'jane.smith@example.com', 'janesmith', 'password456'),
+('Tom', 'Brown', 'tom.brown@example.com', 'tombrown', 'password789'),
+('Lucy', 'Johnson', 'lucy.johnson@example.com', 'lucyjohnson', 'password101');
 
 -- Insert into Sellers (linked to users)
 INSERT INTO Sellers (sellerID) 
@@ -33,10 +33,10 @@ VALUES
     (2, 2, 'Designer Handbag', 'Fashionable handbag from 2022 collection', '2024-01-05 12:00:00', '2024-01-15 12:00:00', 100, 150, TRUE, 'new'),
     (3, 1, 'Garden Tools Set', 'Complete set of gardening tools', '2024-01-02 09:00:00', '2024-01-12 09:00:00', 50, 70, TRUE, 'used'),
     (4, 1, 'Vintage Abstract Art', 'Rare abstract painting from 1950s, rich colors and expressive brushwork', '2024-01-03 14:00:00', '2024-01-13 14:00:00', 1800, 2400, TRUE, 'good'),
-    (10, 2, 'Monster Hunter Rise - Limited Edition', 'PS4 edition of Monster Hunter Rise in perfect condition', '2024-10-03 14:00:00', '2025-01-13 14:00:00', 60, 80, TRUE, 'like new'),
+    (10, 2, 'Monster Hunter Rise - Limited Edition', 'PS4 edition of Monster Hunter Rise in perfect condition', '2024-10-03 14:00:00', '2025-01-13 14:00:00', 60, 80, TRUE, 'new'),
     (6, 1, 'Kratos Sackboy Keychain', 'Used on display and in good condition, keyring missing screw', '2024-09-03 14:00:00', '2024-12-13 14:00:00', 20, 25, TRUE, 'good'),
     (6, 2, 'Nintendo Switch Console', 'Standard Nintendo Switch with two controllers, perfect condition', '2024-12-07 09:00:00', '2025-01-17 09:00:00', 250, 300, TRUE, 'new'),
-    (6, 1, 'Xbox Series X Bundle', 'Includes Xbox Series X with two controllers and three games', '2024-10-08 11:00:00', '2025-01-18 11:00:00', 450, 500, TRUE, 'like new'),
+    (6, 1, 'Xbox Series X Bundle', 'Includes Xbox Series X with two controllers and three games', '2024-10-08 11:00:00', '2025-01-18 11:00:00', 450, 500, TRUE, 'new'),
     (6, 2, 'PlayStation 5', 'PS5 in great condition, with original box and controller', '2024-01-09 15:00:00', '2024-10-19 15:00:00', 500, 600, TRUE, 'good'),
     (6, 1, 'Retro Game Console Collection', 'Classic consoles: NES, SNES, and Sega Genesis with controllers', '2024-08-10 13:00:00', '2025-01-20 13:00:00', 300, 350, TRUE, 'used'),
     (6, 2, 'Rare Gaming Posters Collection', 'Vintage gaming posters from the 1990s in excellent condition', '2024-10-11 14:30:00', '2025-01-21 14:30:00', 75, 100, TRUE, 'good');
