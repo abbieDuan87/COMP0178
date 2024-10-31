@@ -1,15 +1,32 @@
 <?php include_once("header.php")?>
 <?php require("utilities.php")?>
+<?php require("database.php") ?>
+
+<?php
+$connection = get_connection();
+?>
 
 <?php
   // Get info from the URL:
   $item_id = $_GET['item_id'];
 
   // TODO: Use item_id to make a query to the database.
+  $query = " SELECT title, description
+    FROM Auctions
+    WHERE auctionID = $item_id ";
 
+    $result = execute_query($connection, $query);
+
+    if ($row = mysqli_fetch_assoc($result)) {
+    $title = $row['title'];
+    $description = $row['description'];}
+     else {
+    echo "No auction found with this ID.";
+    exit(); }
+    
   // DELETEME: For now, using placeholder data.
-  $title = "Placeholder title";
-  $description = "Description blah blah blah";
+  // $title = "Placeholder title";
+  // $description = "Description blah blah blah";
   $current_price = 30.50;
   $num_bids = 1;
   $end_time = new DateTime('2020-11-02T00:00:00');
@@ -94,7 +111,7 @@
 </div> <!-- End of row #2 -->
 
 
-
+<?php close_connection($connection); ?>
 <?php include_once("footer.php")?>
 
 
