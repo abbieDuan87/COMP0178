@@ -31,7 +31,7 @@ INSERT INTO Auctions (categoryID, sellerID, title, description, createdDate, end
 VALUES 
     (1, 1, 'Toyota Camry 2015', 'Used Toyota Camry in good condition', '2024-01-01 10:00:00', '2024-01-10 10:00:00', 5000, 6000, TRUE, 'good'),
     (2, 2, 'Designer Handbag', 'Fashionable handbag from 2022 collection', '2024-01-05 12:00:00', '2024-01-15 12:00:00', 100, 150, TRUE, 'new'),
-    (3, 1, 'Garden Tools Set', 'Complete set of gardening tools', '2024-01-02 09:00:00', '2024-01-12 09:00:00', 50, 70, TRUE, 'used'),
+    (3, 1, 'Garden Tools Set', 'Complete set of gardening tools', '2024-01-02 09:00:00', '2026-01-12 09:00:00', 50, 70, TRUE, 'used'),
     (4, 1, 'Vintage Abstract Art', 'Rare abstract painting from 1950s, rich colors and expressive brushwork', '2024-01-03 14:00:00', '2024-01-13 14:00:00', 1800, 2400, TRUE, 'good'),
     (10, 2, 'Monster Hunter Rise - Limited Edition', 'PS4 edition of Monster Hunter Rise in perfect condition', '2024-10-03 14:00:00', '2025-01-13 14:00:00', 60, 80, TRUE, 'new'),
     (6, 1, 'Kratos Sackboy Keychain', 'Used on display and in good condition, keyring missing screw', '2024-09-03 14:00:00', '2024-12-13 14:00:00', 20, 25, TRUE, 'good'),
@@ -47,7 +47,13 @@ VALUES
     (1, 3, 5200, '2024-01-05 08:30:00', TRUE),
     (1, 4, 5300, '2024-01-06 10:00:00', FALSE),
     (2, 3, 110, '2024-01-07 11:00:00', TRUE),
-    (3, 4, 55, '2024-01-09 14:45:00', TRUE);
+    (2, 4, 120, '2024-01-08 13:15:00', FALSE),
+    (3, 4, 55, '2024-01-09 14:45:00', FALSE),
+    (3, 4, 75, '2024-01-09 14:45:00', TRUE),  
+    (4, 3, 1850, '2024-01-10 10:30:00', TRUE),
+    (4, 4, 2000, '2024-01-11 16:00:00', FALSE);
+
+    
 
 -- Insert Orders (linked to auctions, buyers, sellers)
 INSERT INTO Orders (auctionID, buyerID, sellerID, orderDate, orderStatus)
