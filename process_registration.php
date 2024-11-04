@@ -12,8 +12,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $password = $_POST["password"];
     $password_confirmation = $_POST["passwordConfirmation"];
 
-    $errorMessage = '';
-    if (empty($first_name) || empty($last_name) || empty($username) || empty($email) || empty($password) || empty($password_confirmation)) {
+    $error_message = '';
+    if (empty($first_name) || empty($last_name) || empty($username) || empty($email) || empty($password) || empty($password_confirmation) || empty($account_type)) {
         $error_message = "Please fill all required fields.";
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $error_message = "Please enter a valid email address.";
@@ -29,32 +29,39 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         exit();
     }
 
-    $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-
     $conn = get_connection();
-    $user_sql = "INSERT INTO users (firstName, lastName, email, username, password) VALUES ('$first_name', '$last_name', '$email', '$username', '$hashed_password')";
 
-    if (execute_query($conn, $user_sql)) {
+    $sql_check_registration = "SELECT * FROM Users WHERE username = '$username' OR email = '$email'";
+    $check_registration_result = execute_query($conn, $sql_check_registration);
 
-        $user_id = mysqli_insert_id($conn);
+    if (mysqli_num_rows($check_registration_result) == 0) {
+        $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+        $user_sql = "INSERT INTO users (firstName, lastName, email, username, password) VALUES ('$first_name', '$last_name', '$email', '$username', '$hashed_password')";
 
-        if ($accountType === "seller") {
-            $seller_sql = "INSERT INTO sellers (sellerID) VALUES ('$user_id')";
-            execute_query($conn, $sellerSql);
+        if (execute_query($conn, $user_sql)) {
+
+            $user_id = mysqli_insert_id($conn);
+
+            if ($account_type == "seller") {
+                $seller_sql = "INSERT INTO sellers (sellerID) VALUES ('$user_id')";
+                execute_query($conn, $seller_sql);
+            } else {
+                $buyer_sql = "INSERT INTO buyers (buyerID) VALUES ('$user_id')";
+                execute_query($conn, $buyer_sql);
+            }
+
+            header("Location: successful_registration.php");
+            exit();
         } else {
-            $buyer_sql = "INSERT INTO buyers (buyerID) VALUES ('$user_id')";
-            execute_query($conn, $buyer_sql);
+            echo "Error: Unable to register user due to a database error.";
         }
-
-        header("Location: successful_registration.php");
-        exit();
     } else {
-        echo "Error: Unable to register user.";
+        $_SESSION['error_message'] = 'A user with this username or email address already exists. Please choose a different one.';
+        header('location: register.php');
+        exit();
     }
 
     close_connection($conn);
 } else {
     echo "Invalid request.";
 }
-
-?>
