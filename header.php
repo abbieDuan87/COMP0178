@@ -1,11 +1,9 @@
 <?php
-  // FIXME: At the moment, I've allowed these values to be set manually.
-  // But eventually, with a database, these should be set automatically
-  // ONLY after the user's login credentials have been verified via a 
-  // database query.
   session_start();
-  $_SESSION['logged_in'] = false;
-  $_SESSION['account_type'] = 'seller';
+  if (!isset($_SESSION['logged_in'])) {
+    $_SESSION['logged_in'] = false;
+    $_SESSION['account_type'] = 'guest';
+}
 ?>
 
 
@@ -88,20 +86,51 @@
 
       <!-- Modal body -->
       <div class="modal-body">
-        <form method="POST" action="login_result.php">
+        <div id="login-error" class="alert alert-danger" style="display: none;"></div> <!-- Error message container -->
+        
+        <form id="loginForm">
           <div class="form-group">
             <label for="email">Email</label>
-            <input type="text" class="form-control" id="email" placeholder="Email">
+            <input type="text" class="form-control" id="email" name="email" placeholder="Email">
           </div>
           <div class="form-group">
             <label for="password">Password</label>
-            <input type="password" class="form-control" id="password" placeholder="Password">
+            <input type="password" class="form-control" id="password" name="password" placeholder="Password">
           </div>
-          <button type="submit" class="btn btn-primary form-control">Sign in</button>
+          <button type="button" class="btn btn-primary form-control" onclick="submitLogin()">Sign in</button>
         </form>
+        
         <div class="text-center">or <a href="register.php">create an account</a></div>
       </div>
 
     </div>
   </div>
 </div> <!-- End modal -->
+
+<script>
+  function submitLogin() {
+    const form = document.getElementById("loginForm");
+    const formData = new FormData(form);
+
+    fetch("login_result.php", {
+      method: "POST",
+      body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.status === "success") {
+        // Close the modal and reload the page to update the login state
+        $('#loginModal').modal('hide');
+        location.reload();
+      } else {
+        // Display the error message in the modal
+        const errorDiv = document.getElementById("login-error");
+        errorDiv.style.display = "block";
+        errorDiv.innerText = data.message;
+      }
+    })
+    .catch(error => {
+      console.error("Error:", error);
+    });
+  }
+</script>
