@@ -31,7 +31,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         if (password_verify($password, $user['password'])) {
             $_SESSION['logged_in'] = true;
-            $_SESSION['username'] = $user['userName'];
+            $_SESSION['username'] = $user['username'];
             $_SESSION['user_id'] = $user['userID'];
 
             // Check if the user is a buyer or seller
