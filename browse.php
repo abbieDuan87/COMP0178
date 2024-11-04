@@ -1,19 +1,25 @@
-<?php include_once("header.php") ?>
-<?php require("utilities.php") ?>
-<?php require("database.php") ?>
+<?php 
+include_once("header.php");
+require("utilities.php");
+require("database.php");
 
-<?php
 $connection = get_connection();
+
+// Display success message if it exists
+if (isset($_SESSION['success_message'])) {
+    echo '<div class="alert alert-success text-center">';
+    echo $_SESSION['success_message'];
+    echo '</div>';
+    unset($_SESSION['success_message']);
+}
 ?>
+
 
 <div class="container">
 
   <h2 class="my-3">Browse listings</h2>
 
   <div id="searchSpecs">
-    <!-- When this form is submitted, this PHP page is what processes it.
-     Search/sort specs are passed to this page through parameters in the URL
-     (GET method of passing data to a page). -->
     <form method="get" action="browse.php">
       <div class="row">
         <div class="col-md-4 pr-0">
@@ -64,7 +70,7 @@ $connection = get_connection();
         </div>
       </div>
     </form>
-  </div> <!-- end search specs bar -->
+  </div>
 
 
 </div>
