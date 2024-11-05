@@ -1,18 +1,50 @@
 <?php include_once("header.php")?>
 <?php require("utilities.php")?>
+<?php require("database.php") ?>
+
+<?php
+$connection = get_connection();
+?>
 
 <?php
   // Get info from the URL:
   $item_id = $_GET['item_id'];
 
   // TODO: Use item_id to make a query to the database.
+  $query = " SELECT 
+              Auctions.title, 
+              Auctions.description, 
+              Auctions.startingPrice, 
+              COALESCE(MAX(Bids.bidPrice), Auctions.startingPrice) AS currentPrice,
+              Auctions.endDate, 
+              COUNT(Bids.bidID) AS num_bids
+            FROM 
+              Auctions
+            LEFT JOIN 
+              Bids ON Auctions.auctionID = Bids.auctionID
+            WHERE 
+              Auctions.auctionID = $item_id
+            GROUP BY 
+              Auctions.auctionID ";
 
+    $result = execute_query($connection, $query);
+
+    if ($row = mysqli_fetch_assoc($result)) {
+    $title = $row['title'];
+    $description = $row['description'];
+    $current_price = $row['currentPrice'];
+    $num_bids = $row['num_bids'];
+    $end_time = new DateTime($row['endDate']);}
+     else {
+    echo "No auction found with this ID.";
+    exit(); }
+    
   // DELETEME: For now, using placeholder data.
-  $title = "Placeholder title";
-  $description = "Description blah blah blah";
-  $current_price = 30.50;
-  $num_bids = 1;
-  $end_time = new DateTime('2020-11-02T00:00:00');
+  // $title = "Placeholder title";
+  // $description = "Description blah blah blah";
+  // $current_price = 30.50;
+  // $num_bids = 1;
+  // $end_time = new DateTime('2026-11-02T00:00:00');
 
   // TODO: Note: Auctions that have ended may pull a different set of data,
   //       like whether the auction ended in a sale or was cancelled due
@@ -69,12 +101,17 @@
   <div class="col-sm-4"> <!-- Right col with bidding info -->
 
     <p>
-<?php if ($now > $end_time): ?>
-     This auction ended <?php echo(date_format($end_time, 'j M H:i')) ?>
+      <?php if ($now > $end_time): ?>
+        This auction ended <?php echo(date_format($end_time, 'j M H:i')) ?>
      <!-- TODO: Print the result of the auction here? -->
-<?php else: ?>
-     Auction ends <?php echo(date_format($end_time, 'j M H:i') . $time_remaining) ?></p>  
-    <p class="lead">Current bid: £<?php echo(number_format($current_price, 2)) ?></p>
+      <?php else: ?>
+        Auction ends: <?php echo date_format($end_time, 'j M H:i'); ?><br>
+        <span><?php echo $time_remaining; ?></span>
+    
+    </p>
+
+    <p class="lead">Current highest bid: £<?php echo(number_format($current_price, 2)) ?></p>
+    <p><?php echo $num_bids . ($num_bids == 1 ? ' bid' : ' bids'); ?></p>
 
     <!-- Bidding form -->
     <form method="POST" action="place_bid.php">
@@ -94,7 +131,7 @@
 </div> <!-- End of row #2 -->
 
 
-
+<?php close_connection($connection); ?>
 <?php include_once("footer.php")?>
 
 
