@@ -23,7 +23,7 @@ function display_time_remaining($interval)
 // This function prints an HTML <li> element containing an auction listing
 function print_listing_li($item_id, $title, $currentPrice, $num_bids, $end_time)
 {
- 
+
   // Fix language of bid vs. bids
   if ($num_bids <= 1) {
     $bid = ' bid';
@@ -42,7 +42,7 @@ function print_listing_li($item_id, $title, $currentPrice, $num_bids, $end_time)
   }
 
   // Print HTML
-    echo (
+  echo (
     "
     <li class='list-group-item'>
       <div class='row ml-1 mt-2 mb-1'>
@@ -64,8 +64,13 @@ function print_listing_li($item_id, $title, $currentPrice, $num_bids, $end_time)
   );
 }
 
-function pagination($curr_page, $max_page)
+function pagination($curr_page, $max_page, $target_link = "browse.php")
 {
+
+  if ($max_page <= 0) {
+    return; // if no max_page (which means no result), show nothing
+  }
+
   // Copy any currently-set GET variables to the URL.
   $querystring = "";
   foreach ($_GET as $key => $value) {
@@ -82,7 +87,7 @@ function pagination($curr_page, $max_page)
   if ($curr_page != 1) {
     echo ('
 <li class="page-item">
-  <a class="page-link" href="browse.php?' . $querystring . 'page=' . ($curr_page - 1) . '" aria-label="Previous">
+  <a class="page-link" href="' . $target_link . '?' . $querystring . 'page=' . ($curr_page - 1) . '" aria-label="Previous">
     <span aria-hidden="true"><i class="fa fa-arrow-left"></i></span>
     <span class="sr-only">Previous</span>
   </a>
@@ -99,13 +104,13 @@ function pagination($curr_page, $max_page)
     }
 
     // Do this in any case
-    echo ('<a class="page-link" href="browse.php?' . $querystring . 'page=' . $i . '">' . $i . '</a></li>');
+    echo ('<a class="page-link" href="' . $target_link . '?' . $querystring . 'page=' . $i . '">' . $i . '</a></li>');
   }
 
   if ($curr_page != $max_page) {
     echo ('
 <li class="page-item">
-  <a class="page-link" href="browse.php?' . $querystring . 'page=' . ($curr_page + 1) . '" aria-label="Next">
+  <a class="page-link" href="' . $target_link . '?' . $querystring . 'page=' . ($curr_page + 1) . '" aria-label="Next">
     <span aria-hidden="true"><i class="fa fa-arrow-right"></i></span>
     <span class="sr-only">Next</span>
   </a>
@@ -113,9 +118,88 @@ function pagination($curr_page, $max_page)
   }
 }
 
-function sanitise_user_input($data) {
+function sanitise_user_input($data)
+{
   $data = trim($data);
   $data = htmlspecialchars($data);
   $data = str_replace(['%', '_'], ['\\%', '\\_'], $data);
   return $data;
+}
+
+/**
+ * Constructs a SQL query to retrieve auction listings or count them based on 
+ * specified filters and ordering options.
+ *
+ * @param string $keyword       The search term to filter auctions by title or description.
+ * @param int|string $category  The category ID to filter auctions; "0" for no category filter.
+ * @param string $ordering      Specifies the sorting order: 'pricehigh', 'pricelow', or 'date'.
+ * @param bool|string $active_only If true or "1", restricts results to active auctions only.
+ * @param bool $count_mode      If true, generates a query to count the filtered auctions 
+ *                              instead of retrieving auction details.
+ * 
+ * @return array                An array containing:
+ *                              - The generated SQL query string.
+ *                              - An array of parameters for the query.
+ *                              - A string of parameter types for prepared statements.
+ * 
+ * Usage:
+ * - When $count_mode is set to true, the function generates a simplified query to count 
+ *   the total number of auctions matching the filters, without applying GROUP BY or ORDER BY.
+ * - When $count_mode is false, the function generates a detailed query to retrieve auction 
+ *   listings with bid count and current price, applying grouping and ordering as specified.
+ */
+function build_auction_query($keyword, $category, $ordering, $active_only, $count_mode = false)
+{
+  // Start with base query depending on count mode
+  $query = $count_mode
+    ? "SELECT COUNT(DISTINCT auctions.auctionID) AS total FROM auctions"
+    : "SELECT auctions.*, COUNT(bids.bidID) AS bidCount, 
+          COALESCE(MAX(bids.bidPrice), auctions.startingPrice) AS currentPrice 
+        FROM auctions LEFT JOIN bids ON auctions.auctionID = bids.auctionID";
+
+  // Initialize query parts for filtering and parameter collection
+  $filters = [];
+  $params = [];
+  $types = "";
+
+  // Category filter
+  if ($category != "0") {
+    $filters[] = "auctions.categoryID = ?";
+    $params[] = $category;
+    $types .= "i";
+  }
+
+  // Keyword filter
+  if (!empty($keyword)) {
+    $filters[] = "(auctions.title LIKE ? OR auctions.description LIKE ?)";
+    $keyword_param = "%" . sanitise_user_input($keyword) . "%";
+    $params[] = $keyword_param;
+    $params[] = $keyword_param;
+    $types .= "ss";
+  }
+
+  // Active-only filter
+  if (!empty($active_only) && $active_only == "1") {
+    $filters[] = "(endDate >= NOW() AND auctionStatus = TRUE)";
+  }
+
+  // Apply filters with WHERE clause
+  if (!empty($filters)) {
+    $query .= " WHERE " . implode(" AND ", $filters);
+  }
+
+  // Apply grouping and ordering only if not in count mode
+  if (!$count_mode) {
+    $query .= " GROUP BY auctions.auctionID";
+
+    if ($ordering === 'pricehigh') {
+      $query .= " ORDER BY currentPrice DESC";
+    } else if ($ordering === 'pricelow') {
+      $query .= " ORDER BY currentPrice";
+    } else if ($ordering === 'date') {
+      $query .= " ORDER BY endDate";
+    }
+  }
+
+  return [$query, $params, $types];
 }

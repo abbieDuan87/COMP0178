@@ -21,9 +21,13 @@ include("database.php");
     if ($_SESSION['account_type'] == "seller") {
       $seller_id = $_SESSION['user_id'];
     } else {
-      echo "You don't have access to this page";
+      echo "<p class='text-center font-weight-light'>Oops! It seems that you do not have permission to access this page. Please contact support if you believe this is a mistake.</p>";
       exit();
     }
+  } else {
+    echo "<p class='text-center font-weight-light'>Hi there! It looks like you need to log in to view this page.<br>You will be redirected to the browse page shortly. </p>";
+    header("refresh:5;url=browse.php");
+    exit();
   }
 
   // Perform a query to pull up their auctions.
@@ -39,7 +43,7 @@ include("database.php");
               FROM auctions
               LEFT JOIN bids on auctions.auctionID = bids.auctionID
               WHERE auctions.sellerID = $seller_id";
-  
+
   // Variables for pagination
   $results_per_page = 6;
   $offset = ($curr_page - 1) * $results_per_page;
@@ -64,7 +68,11 @@ include("database.php");
         );
       }
     } else {
-      echo "<p class='text-center font-weight-light'>No auction.</p>";
+      echo "<p class='text-center font-weight-light'>
+      No auctions found at the moment.</p>";
+      echo "<div class='text-center'>
+      <a href='create_auction.php' class='btn btn-outline-primary btn-sm'>Start Your Auction</a>
+      </div>";
     }
     ?>
   </ul>
@@ -74,7 +82,7 @@ include("database.php");
     <ul class="pagination justify-content-center">
 
       <?php
-      pagination($curr_page, $max_page);
+      pagination($curr_page, $max_page, "mylistings.php");
       ?>
 
     </ul>
