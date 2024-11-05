@@ -24,6 +24,13 @@ session_start();
     $auctionReservePrice = $_POST["auctionReservePrice"];
     $auctionEndDate = $_POST["auctionEndDate"];
 
+    // Check if an image was uploaded
+    $imageData = null;
+    if (isset($_FILES['auctionImage']) && $_FILES['auctionImage']['error'] == UPLOAD_ERR_OK) {
+    // Read the image file as binary data
+        $imageData = mysqli_real_escape_string($connection, file_get_contents($_FILES['auctionImage']['tmp_name']));
+    }
+
     $sellerID = 123; // dummy seller ID for now 
     $createdDate = date("Y-m-d H:i:s"); // current time
     $auctionStatus = 1;
@@ -32,7 +39,7 @@ session_start();
 
 /* TODO #3: If everything looks good, make the appropriate call to insert
             data into the database. */
-    $sql = "INSERT INTO Auctions (categoryID, sellerID, title, `description`, createdDate, endDate, startingPrice, reservePrice, auctionStatus, itemCondition) 
+    $sql = "INSERT INTO Auctions (categoryID, sellerID, title, `description`, createdDate, endDate, startingPrice, reservePrice, auctionStatus, itemCondition, itemImage) 
             VALUES (
               '".mysqli_real_escape_string($connection, $auctionCategory)."', 
               '".mysqli_real_escape_string($connection, $sellerID)."', 
@@ -43,7 +50,8 @@ session_start();
               $auctionStartPrice, 
               $auctionReservePrice, 
               $auctionStatus, 
-              '$itemCondition'
+              '$itemCondition',
+              '$imageData'
             )";
     execute_query($connection, $sql);
 

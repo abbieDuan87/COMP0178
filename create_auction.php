@@ -40,12 +40,19 @@
       before they try to send it, but that kind of functionality should be
       extremely low-priority / only done after all database functions are
       complete. -->
-      <form method="post" action="create_auction_result.php">
+      <form method="post" action="create_auction_result.php" enctype="multipart/form-data">
         <div class="form-group row">
           <label for="auctionTitle" class="col-sm-2 col-form-label text-right">Title of auction</label>
           <div class="col-sm-10">
             <input type="text" class="form-control" name="auctionTitle" id="auctionTitle" placeholder="e.g. Black mountain bike">
             <small id="titleHelp" class="form-text text-muted"><span class="text-danger">* Required.</span> A short description of the item you're selling, which will display in listings.</small>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="auctionImage" class="col-sm-2 col-form-label text-right">Upload Image</label>
+          <div class="col-sm-10">
+            <input type="file" class="form-control" name="auctionImage" id="auctionImage" accept="image/*" required>
+            <small id="imageHelp" class="form-text text-muted"><span class="text-danger">* Required.</span> Upload an image of the item.</small>
           </div>
         </div>
         <div class="form-group row">
