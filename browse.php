@@ -84,7 +84,7 @@ $curr_page = isset($_GET['page']) & !empty($_GET['page'])? $_GET['page'] : 1;
 $active_only = isset($_GET['active_only']) ? $_GET['active_only'] : ""; 
 
 // Base query
-$auction_list_sql = "SELECT auctions.*, COUNT(bids.bidID) AS bidCount,
+$auction_list_sql = "SELECT auctions.auctionID, auctions.title, auctions.endDate, COUNT(bids.bidID) AS bidCount,
         COALESCE(MAX(bids.bidPrice), auctions.startingPrice) AS currentPrice
         FROM auctions
         LEFT JOIN bids ON auctions.auctionID = bids.auctionID ";
@@ -172,8 +172,6 @@ $auction_list_result = execute_prepared_stmt_query($connection, $auction_list_sq
       print_listing_li(
         $row['auctionID'],
         $row['title'],
-        $row['description'],
-        $row['startingPrice'],
         $row['currentPrice'],
         $row['bidCount'],
         new DateTime($row['endDate'])

@@ -21,15 +21,9 @@ function display_time_remaining($interval)
 
 // print_listing_li:
 // This function prints an HTML <li> element containing an auction listing
-function print_listing_li($item_id, $title, $desc, $startingPrice, $currentPrice, $num_bids, $end_time)
+function print_listing_li($item_id, $title, $currentPrice, $num_bids, $end_time)
 {
-  // Truncate long descriptions
-  if (strlen($desc) > 100) {
-    $desc_shortened = substr($desc, 0, 100) . '...';
-  } else {
-    $desc_shortened = $desc;
-  }
-
+ 
   // Fix language of bid vs. bids
   if ($num_bids <= 1) {
     $bid = ' bid';
@@ -48,22 +42,20 @@ function print_listing_li($item_id, $title, $desc, $startingPrice, $currentPrice
   }
 
   // Print HTML
-  echo (
+    echo (
     "
     <li class='list-group-item'>
       <div class='row ml-1 mt-2 mb-1'>
         <div class='col-6'>
           <h5><a href='listing.php?item_id={$item_id}'>{$title}</a></h5>
-          {$desc_shortened}
         </div>
         <div class='col'>
           <div class='row'>
             <div class='col'><span style='font-size: 1.4em' class='font-weight-bolder'>£" . number_format($currentPrice, 2) . "</span></div>
-            <div class='col'><div class='mt-1'>{$num_bids} <span>{$bid}</span></div></div>
-          </div>
-          <div class='row mt-1'>
-            <div class='col'><div class='font-weight-light'>starting price: <span class='font-weight-bolder'>£" . number_format($startingPrice, 2) . "</span></div></div>
-            <div class='col'>{$time_remaining}</div>
+            <div class='col'>
+              <div class='mt-1'>{$num_bids} <span>{$bid}</span></div>
+              <div class='text-muted'>{$time_remaining}</div>
+            </div>
           </div>
         </div>
       </div>
