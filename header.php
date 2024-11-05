@@ -119,11 +119,8 @@
     .then(response => response.json())
     .then(data => {
       if (data.status === "success") {
-        // Close the modal and reload the page to update the login state
-        $('#loginModal').modal('hide');
-        location.reload();
+        window.location.href = "index.php";
       } else {
-        // Display the error message in the modal
         const errorDiv = document.getElementById("login-error");
         errorDiv.style.display = "block";
         errorDiv.innerText = data.message;
