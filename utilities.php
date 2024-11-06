@@ -203,3 +203,72 @@ function build_auction_query($keyword, $category, $ordering, $active_only, $coun
 
   return [$query, $params, $types];
 }
+
+function mask_username($username)
+{
+  return substr($username, 0, 1) . "***" . substr($username, -1, 1);
+}
+
+function format_price($price)
+{
+  return '£' . (number_format($price, 2));
+}
+
+function render_bid_history_table($bid_history_result, $starting_price, $created_date)
+{
+?>
+  <table class="table table-borderless">
+    <thead class="border bg-light">
+      <tr>
+        <th scope="col">Bidder</th>
+        <th scope="col">Bid Amount</th>
+        <th scope="col">Bid Time</th>
+      </tr>
+    </thead>
+    <tbody>
+      <?php if (mysqli_num_rows($bid_history_result) > 0): ?>
+        <?php while ($row = mysqli_fetch_assoc($bid_history_result)): ?>
+          <tr class="border <?php echo $row['isSuccessful'] == 1 ? 'font-weight-bold' : ''; ?>">
+            <td><?php echo htmlspecialchars(mask_username($row['username'])); ?></td>
+            <td><?php echo htmlspecialchars(format_price($row['bidPrice'])); ?></td>
+            <td><?php echo htmlspecialchars($row['bidDate']); ?></td>
+          </tr>
+        <?php endwhile; ?>
+        <tr class="border">
+          <td>Starting Price</td>
+          <td><?php echo htmlspecialchars(format_price($starting_price)); ?></td>
+          <td><?php echo htmlspecialchars($created_date); ?></td>
+        </tr>
+      <?php else: ?>
+        <tr class="border">
+          <td colspan="3" class="text-center">No bids found.</td>
+        </tr>
+      <?php endif; ?>
+    </tbody>
+  </table>
+<?php
+}
+
+function display_bid_form($item_id)
+{
+  if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) {
+    $account_type = $_SESSION['account_type'];
+
+    if ($account_type == "buyer") {
+      echo '
+            <form method="POST" action="place_bid.php">
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">£</span>
+                    </div>
+                    <input type="number" class="form-control" id="bid" name="bid_price">
+                    <input type="hidden" name="item_id" value="' . htmlspecialchars($item_id) . '">
+                </div>
+                <button type="submit" class="btn btn-primary form-control">Place bid</button>
+            </form>';
+    }
+  } else {
+    echo '<button class="btn btn-primary form-control mt-2" disabled>Place bid</button>';
+    echo "<div class='text-center text-muted mt-1'>Interested in this item? <br> Log in as a buyer to make your bid!</div>";
+  }
+}
