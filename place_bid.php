@@ -32,6 +32,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $starting_price = $row['startingPrice'];
         $current_highest_bid = $row['currentHighestBid'];
 
+        if ($bid_price <= 0) {
+            $_SESSION['warning_message'] = 'Please enter a valid bid amount.';
+            header('location: listing.php?item_id=' . $item_id);
+            exit();
+        }
+
         // Check if the user's bid is higher than or equal to the current highest bid and starting price
         if ($bid_price <= $current_highest_bid) {
             $_SESSION['warning_message'] = 'Your bid must be higher than the current highest bid (' . format_price($current_highest_bid) . ').';
