@@ -226,14 +226,22 @@ function render_bid_history_table($bid_history_result, $starting_price, $created
       </tr>
     </thead>
     <tbody>
-      <?php if (mysqli_num_rows($bid_history_result) > 0): ?>
-        <?php while ($row = mysqli_fetch_assoc($bid_history_result)): ?>
-          <tr class="border <?php echo $row['isSuccessful'] == 1 ? 'font-weight-bold' : ''; ?>">
+      <?php 
+      if (mysqli_num_rows($bid_history_result) > 0): 
+        // Fetch the first (latest) bid
+        $is_first_row = true; 
+        while ($row = mysqli_fetch_assoc($bid_history_result)): 
+      ?>
+          <tr class="border <?php echo $is_first_row ? 'font-weight-bold' : ''; ?>">
             <td><?php echo htmlspecialchars(mask_username($row['username'])); ?></td>
             <td><?php echo htmlspecialchars(format_price($row['bidPrice'])); ?></td>
             <td><?php echo htmlspecialchars($row['bidDate']); ?></td>
           </tr>
-        <?php endwhile; ?>
+          <?php 
+          // Once we hit the first row (latest bid), set $is_first_row to false
+          $is_first_row = false;
+          endwhile; 
+        ?>
         <tr class="border">
           <td>Starting Price</td>
           <td><?php echo htmlspecialchars(format_price($starting_price)); ?></td>
