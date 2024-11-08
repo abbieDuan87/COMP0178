@@ -2,13 +2,12 @@
 <?php include_once("database.php");?>
 
 <?php
-/* (Uncomment this block to redirect people without selling privileges away from this page)
   // If user is not logged in or not a seller, they should not be able to
   // use this page.
+  session_start();
   if (!isset($_SESSION['account_type']) || $_SESSION['account_type'] != 'seller') {
     header('Location: browse.php');
   }
-*/
 ?>
 
 <?php
@@ -53,6 +52,18 @@
           <div class="col-sm-10">
             <input type="file" class="form-control" name="auctionImage" id="auctionImage" accept="image/*" required>
             <small id="imageHelp" class="form-text text-muted"><span class="text-danger">* Required.</span> Upload an image of the item.</small>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="itemCondition" class="col-sm-2 col-form-label text-right">Item Condition</label>
+          <div class="col-sm-10">
+            <select class="form-control" name="itemCondition" id="itemCondition" required>
+              <option selected disabled>Choose...</option>
+              <option value="new">New</option>
+              <option value="good">Good</option>
+              <option value="used">Used</option>
+            </select>
+            <small id="startBidHelp" class="form-text text-muted"><span class="text-danger">
           </div>
         </div>
         <div class="form-group row">
