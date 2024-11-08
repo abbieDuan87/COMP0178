@@ -25,7 +25,7 @@ function print_listing_li($item_id, $title, $currentPrice, $num_bids, $end_time)
 {
 
   // Fix language of bid vs. bids
-  if ($num_bids <= 1) {
+  if ($num_bids = 1) {
     $bid = ' bid';
   } else {
     $bid = ' bids';
@@ -52,6 +52,52 @@ function print_listing_li($item_id, $title, $currentPrice, $num_bids, $end_time)
         <div class='col'>
           <div class='row'>
             <div class='col'><span style='font-size: 1.4em' class='font-weight-bolder'>£" . number_format($currentPrice, 2) . "</span></div>
+            <div class='col'>
+              <div class='mt-1'>{$num_bids} <span>{$bid}</span></div>
+              <div class='text-muted'>{$time_remaining}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </li>
+    "
+  );
+}
+
+// print_my_bids_listing:
+// specifically for the "My Bids" page, showing both the highest bid and the user's bid.
+function print_my_bids_listing($item_id, $title, $highestBid, $userBid, $num_bids, $end_time)
+{
+  // Fix language of bid vs. bids
+  if ($num_bids <= 1) {
+    $bid = ' bid';
+  } else {
+    $bid = ' bids';
+  }
+
+  // Calculate time to auction end
+  $now = new DateTime();
+  if ($now > $end_time) {
+    $time_remaining = 'This auction has ended';
+  } else {
+    $time_to_end = date_diff($now, $end_time);
+    $time_remaining = display_time_remaining($time_to_end) . ' remaining';
+  }
+
+  // Print HTML
+  echo (
+    "
+    <li class='list-group-item'>
+      <div class='row ml-1 mt-2 mb-1'>
+        <div class='col-6 d-flex align-items-center'>
+          <h5><a href='listing.php?item_id={$item_id}'>{$title}</a></h5>
+        </div>
+        <div class='col'>
+          <div class='row'>
+            <div class='col'>
+              <span style='font-size: 1.4em' class='font-weight-bolder'>£" . number_format($highestBid, 2) . "</span>
+              <div class='text-muted'>Your bid: £" . number_format($userBid, 2) . "</div>
+            </div>
             <div class='col'>
               <div class='mt-1'>{$num_bids} <span>{$bid}</span></div>
               <div class='text-muted'>{$time_remaining}</div>

@@ -1,24 +1,66 @@
-<?php include_once("header.php")?>
-<?php require("utilities.php")?>
-
-<div class="container">
-
-<h2 class="my-3">My bids</h2>
-
 <?php
-  // This page is for showing a user the auctions they've bid on.
-  // It will be pretty similar to browse.php, except there is no search bar.
-  // This can be started after browse.php is working with a database.
-  // Feel free to extract out useful functions from browse.php and put them in
-  // the shared "utilities.php" where they can be shared by multiple files.
-  
-  
-  // TODO: Check user's credentials (cookie/session).
-  
-  // TODO: Perform a query to pull up the auctions they've bidded on.
-  
-  // TODO: Loop through results and print them out as list items.
-  
+include_once("header.php");
+require("utilities.php");
+require("database.php");
+
+$connection = get_connection();
+
+$buyer_id = $_SESSION['user_id'];
+
+$my_bids_query = "
+   SELECT 
+    Auctions.auctionID, 
+    Auctions.title, 
+    COALESCE(MAX(Bids.bidPrice), Auctions.startingPrice) AS highestBid,
+    COUNT(Bids.bidID) AS bidCount,
+    Auctions.endDate,
+    COALESCE(UserBids.userBidPrice, Auctions.startingPrice) AS userBidPrice
+FROM 
+    Auctions
+LEFT JOIN 
+    Bids ON Auctions.auctionID = Bids.auctionID
+LEFT JOIN 
+    (SELECT auctionID, MAX(bidPrice) AS userBidPrice 
+     FROM Bids 
+     WHERE buyerID = $buyer_id 
+     GROUP BY auctionID) AS UserBids 
+     ON Auctions.auctionID = UserBids.auctionID
+WHERE 
+    Bids.buyerID = $buyer_id OR UserBids.userBidPrice IS NOT NULL
+GROUP BY 
+    Auctions.auctionID
+";
+
+$result = execute_query($connection, $my_bids_query);
+
 ?>
 
-<?php include_once("footer.php")?>
+<div class="container">
+  <h2 class="my-3">My Bids</h2>
+
+  <ul class="list-group">
+    <?php
+    if (mysqli_num_rows($result) == 0) {
+      echo "<p class='text-center font-weight-light'>No bids found.</p>";
+    } else {
+      while ($row = mysqli_fetch_assoc($result)) {
+        // Using print_my_bids_listing instead
+        print_my_bids_listing(
+          $row['auctionID'],
+          $row['title'],
+          $row['highestBid'],
+          $row['userBidPrice'],
+          $row['bidCount'],
+          new DateTime($row['endDate'])
+        );
+      }
+    }
+    ?>
+  </ul>
+</div>
+
+
+<?php
+close_connection($connection);
+include_once("footer.php");
+?>
