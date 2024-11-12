@@ -31,6 +31,7 @@ $auction_info_query = " SELECT
               Auctions.createdDate,
               Auctions.endDate, 
               Auctions.itemCondition, 
+              Auctions.itemImage,
               COUNT(Bids.bidID) AS num_bids
             FROM 
               Auctions
@@ -53,6 +54,7 @@ if ($row = mysqli_fetch_assoc($auction_info_result)) {
   $created_date = $row['createdDate'];
   $end_time = new DateTime($row['endDate']);
   $item_condition = $row['itemCondition'];
+  $item_image = base64_encode($row['itemImage']);
 } else {
   echo "No auction found with this ID.";
   exit();
@@ -96,7 +98,7 @@ $watching = false; // later determined this by using query.
   <div class="row"> <!-- Row #2 with auction description + bidding info -->
     <div class="col-sm-8"> <!-- Left col with item info -->
       <div>
-        <img src="https://placehold.co/600x500" class="img-fluid rounded" alt="example image" style="max-width: 100%; max-height: 400px; width: auto; height: auto;">
+        <img src="data:image/jpeg;base64,<?php echo $item_image; ?>" class="img-fluid rounded" alt="example image" style="max-width: 100%; max-height: 400px; width: auto; height: auto;">
       </div>
 
     </div>

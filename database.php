@@ -12,12 +12,17 @@ function get_connection()
 
 function execute_query($connection, $sql)
 {
-    $result = mysqli_query($connection, $sql);
+    try {
+        $result = mysqli_query($connection, $sql);
 
-    if (!$result) {
-        die('Query error: ' . mysqli_error($connection));
+        if (!$result) {
+            die('Query error: ' . mysqli_error($connection));
+        }
+        return $result;
+    } catch (Exception $e) {
+        // Log the exception message to the console
+        echo "<script>console.log('PHP Exception: " . addslashes($e->getMessage()) . "');</script>";
     }
-    return $result;
 }
 
 function close_connection($connection)
