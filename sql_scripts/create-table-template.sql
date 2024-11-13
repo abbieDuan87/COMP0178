@@ -61,7 +61,7 @@ CREATE TABLE Auctions (
     endDate DATETIME NOT NULL,
     startingPrice FLOAT NOT NULL,
     reservePrice FLOAT,
-    itemImage BINARY,
+    itemImage VARCHAR(255) NOT NULL,
     auctionStatus BOOLEAN NOT NULL,
     itemCondition ENUM('new', 'good', 'used') NOT NULL,
     FOREIGN KEY (categoryID) REFERENCES Categories(categoryID)
