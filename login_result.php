@@ -33,6 +33,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION['logged_in'] = true;
             $_SESSION['username'] = $user['username'];
             $_SESSION['user_id'] = $user['userID'];
+            $_SESSION['email'] = $user['email'];
 
             // Check if the user is a buyer or seller
             $accountQuery = "SELECT * FROM Buyers WHERE buyerID = {$user['userID']}";

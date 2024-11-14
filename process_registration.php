@@ -1,5 +1,6 @@
 <?php
 include_once("database.php");
+include_once("email_utilities.php");
 session_start();
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -49,7 +50,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $buyer_sql = "INSERT INTO buyers (buyerID) VALUES ('$user_id')";
                 execute_query($conn, $buyer_sql);
             }
-
+            queue_email_by_type($conn, $email, 'registration');
+            
             header("Location: successful_registration.php");
             exit();
         } else {

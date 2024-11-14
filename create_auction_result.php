@@ -1,6 +1,7 @@
 <?php 
 include_once("header.php");
 include_once("database.php");
+include_once("email_utilities.php");
 
 if (!isset($_SESSION['user_id']) || $_SESSION['account_type'] != 'seller') {
     header('Location: browse.php');
@@ -67,6 +68,21 @@ $sql = "INSERT INTO Auctions (categoryID, sellerID, title, description, createdD
           '$imagePath'
         )";
 
+    if (execute_query($connection, $sql)) {
+        // Get the ID of the newly inserted record
+        $inserted_id = mysqli_insert_id($connection);
+        
+        // Add the successful email to emailQueue
+        if (isset($_SESSION['email']) && !empty($_SESSION['email'])) {
+            queue_email_by_type($connection, $_SESSION['email'], "create_auction", ['auction_title' => $title]);
+        }
+
+        // Redirect to listing.php with the item_id as a URL parameter
+        header("Location: listing.php?item_id=" . $inserted_id);
+        exit; // Ensure no further code is executed after the redirect
+    } else {
+        echo "Error: " . $sql . "<br>" . mysqli_error($connection);
+    }
 if (execute_query($connection, $sql)) {
     $inserted_id = mysqli_insert_id($connection);
     header("Location: listing.php?item_id=" . $inserted_id);

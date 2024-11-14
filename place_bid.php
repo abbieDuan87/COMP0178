@@ -2,6 +2,7 @@
 session_start();
 include_once("database.php");
 include_once("utilities.php");
+include_once("email_utilities.php");
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
@@ -22,7 +23,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $buyer_id = $_SESSION['user_id'];
 
         // Get the current highest bid for the item and the starting price
-        $query = "SELECT Auctions.startingPrice, COALESCE(MAX(bidPrice), 0) AS currentHighestBid
+        $query = "SELECT Auctions.startingPrice, COALESCE(MAX(bidPrice), 0) AS currentHighestBid, Auctions.title
                   FROM Auctions
                   LEFT JOIN bids ON Auctions.auctionID = bids.auctionID
                   WHERE Auctions.auctionID = $item_id
@@ -31,6 +32,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $row = mysqli_fetch_assoc($result);
         $starting_price = $row['startingPrice'];
         $current_highest_bid = $row['currentHighestBid'];
+
+        $auction_title = $row['title'];
 
         if ($bid_price <= 0) {
             $_SESSION['warning_message'] = 'Please enter a valid bid amount.';
@@ -56,6 +59,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         if (execute_query($conn, $query)) {
             $_SESSION['success_message'] = 'Your bid has been placed successfully!';
+            // queue the email for success bid for current user
+            if (isset($_SESSION['email']) && !empty($_SESSION['email'])) {
+                queue_email_by_type($conn, $_SESSION['email'], 'successful_bid', ['auction_title' => $auction_title]);
+            }
+            // queue the emails for noticing the outbidded users
+            queue_outbid_notifications_email($conn, $item_id, $buyer_id, $bid_price, $auction_title);
         } else {
             $_SESSION['warning_message'] = 'There was an error placing your bid. Please try again.';
         }
