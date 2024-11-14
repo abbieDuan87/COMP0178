@@ -1,61 +1,50 @@
-<?php include_once("header.php")?>
-<?php include_once("database.php");?>
+<?php 
+include_once("header.php");
+include_once("database.php");
 
-<?php
-  // If user is not logged in or not a seller, they should not be able to
-  // use this page.
-  session_start();
-  if (!isset($_SESSION['account_type']) || $_SESSION['account_type'] != 'seller') {
+if (!isset($_SESSION['account_type']) || $_SESSION['account_type'] != 'seller') {
     header('Location: browse.php');
-  }
-?>
+    exit();
+}
 
-<?php
-  $connection = get_connection();
-  $sql = "SELECT * FROM Categories";
-  $result = execute_query($connection, $sql);
-  // Store categories in an array
-  $categories = [];
-  while ($row = mysqli_fetch_assoc($result)) {
-      $categories[] = $row;
-  }
+$connection = get_connection();
+$errors = $_SESSION['form_errors'] ?? [];
+$formData = $_SESSION['form_data'] ?? [];
+unset($_SESSION['form_errors'], $_SESSION['form_data']);
 
-  // Free the result and close the connection
-  mysqli_free_result($result);
-  mysqli_close($connection);
+$sql = "SELECT * FROM Categories";
+$result = execute_query($connection, $sql);
+$categories = [];
+while ($row = mysqli_fetch_assoc($result)) {
+    $categories[] = $row;
+}
+mysqli_free_result($result);
+mysqli_close($connection);
 ?>
 
 <div class="container">
 
-<!-- Create auction form -->
-<div style="max-width: 800px; margin: 10px auto">
+<div style="max-width: 900px; margin: 10px auto">
   <h2 class="my-3">Create new auction</h2>
+  <p class="text-muted">Fields marked with <span class="text-danger">*</span> are required.</p>
+  
   <div class="card">
     <div class="card-body">
-      <!-- Note: This form does not do any dynamic / client-side / 
-      JavaScript-based validation of data. It only performs checking after 
-      the form has been submitted, and only allows users to try once. You 
-      can make this fancier using JavaScript to alert users of invalid data
-      before they try to send it, but that kind of functionality should be
-      extremely low-priority / only done after all database functions are
-      complete. -->
       <form method="post" action="create_auction_result.php" enctype="multipart/form-data">
         <div class="form-group row">
-          <label for="auctionTitle" class="col-sm-2 col-form-label text-right">Title of auction</label>
+          <label for="auctionTitle" class="col-sm-2 col-form-label text-right">Title <span class="text-danger">*</span></label>
           <div class="col-sm-10">
-            <input type="text" class="form-control" name="auctionTitle" id="auctionTitle" placeholder="e.g. Black mountain bike">
-            <small id="titleHelp" class="form-text text-muted"><span class="text-danger">* Required.</span> A short description of the item you're selling, which will display in listings.</small>
+            <input type="text" class="form-control" name="auctionTitle" id="auctionTitle" placeholder="e.g. Black mountain bike" required>
           </div>
         </div>
         <div class="form-group row">
-          <label for="auctionImage" class="col-sm-2 col-form-label text-right">Upload Image</label>
+          <label for="auctionImage" class="col-sm-2 col-form-label text-right">Upload Image <span class="text-danger">*</span></label>
           <div class="col-sm-10">
             <input type="file" class="form-control" name="auctionImage" id="auctionImage" accept="image/*" required>
-            <small id="imageHelp" class="form-text text-muted"><span class="text-danger">* Required.</span> Upload an image of the item.</small>
           </div>
         </div>
         <div class="form-group row">
-          <label for="itemCondition" class="col-sm-2 col-form-label text-right">Item Condition</label>
+          <label for="itemCondition" class="col-sm-2 col-form-label text-right">Item Condition <span class="text-danger">*</span></label>
           <div class="col-sm-10">
             <select class="form-control" name="itemCondition" id="itemCondition" required>
               <option selected disabled>Choose...</option>
@@ -63,40 +52,36 @@
               <option value="good">Good</option>
               <option value="used">Used</option>
             </select>
-            <small id="startBidHelp" class="form-text text-muted"><span class="text-danger">
           </div>
         </div>
         <div class="form-group row">
           <label for="auctionDetails" class="col-sm-2 col-form-label text-right">Details</label>
           <div class="col-sm-10">
             <textarea class="form-control" name="auctionDetails" id="auctionDetails" rows="4"></textarea>
-            <small id="detailsHelp" class="form-text text-muted">Full details of the listing to help bidders decide if it's what they're looking for.</small>
           </div>
         </div>
         <div class="form-group row">
-          <label for="auctionCategory" class="col-sm-2 col-form-label text-right">Category</label>
+          <label for="auctionCategory" class="col-sm-2 col-form-label text-right">Category <span class="text-danger">*</span></label>
           <div class="col-sm-10">
-            <select class="form-control" name="auctionCategory" id="auctionCategory">
-              <option selected disabled>Choose...</option>
+            <select class="form-control" name="auctionCategory" id="auctionCategory" required>
+              <option selected disabled value="">Choose...</option>
               <?php foreach ($categories as $category): ?>
                 <option value="<?= htmlspecialchars($category['categoryID']); ?>">
                   <?= htmlspecialchars($category['name']); ?>
                 </option>
               <?php endforeach; ?>
             </select>
-            <small id="categoryHelp" class="form-text text-muted"><span class="text-danger">* Required.</span> Select a category for this item.</small>
           </div>
         </div>
         <div class="form-group row">
-          <label for="auctionStartPrice" class="col-sm-2 col-form-label text-right">Starting price</label>
+          <label for="auctionStartPrice" class="col-sm-2 col-form-label text-right">Starting price <span class="text-danger">*</span></label>
           <div class="col-sm-10">
 	        <div class="input-group">
               <div class="input-group-prepend">
                 <span class="input-group-text">£</span>
               </div>
-              <input type="number" class="form-control" name="auctionStartPrice" id="auctionStartPrice">
+              <input type="number" class="form-control" name="auctionStartPrice" id="auctionStartPrice" required>
             </div>
-            <small id="startBidHelp" class="form-text text-muted"><span class="text-danger">* Required.</span> Initial bid amount.</small>
           </div>
         </div>
         <div class="form-group row">
@@ -112,10 +97,9 @@
           </div>
         </div>
         <div class="form-group row">
-          <label for="auctionEndDate" class="col-sm-2 col-form-label text-right">End date</label>
+          <label for="auctionEndDate" class="col-sm-2 col-form-label text-right">End date <span class="text-danger">*</span></label>
           <div class="col-sm-10">
-            <input type="datetime-local" class="form-control" name="auctionEndDate" id="auctionEndDate">
-            <small id="endDateHelp" class="form-text text-muted"><span class="text-danger">* Required.</span> Day for the auction to end.</small>
+            <input type="datetime-local" class="form-control" name="auctionEndDate" id="auctionEndDate" required>
           </div>
         </div>
         <button type="submit" class="btn btn-primary form-control">Create Auction</button>
@@ -126,5 +110,4 @@
 
 </div>
 
-
-<?php include_once("footer.php")?>
+<?php include_once("footer.php") ?>
