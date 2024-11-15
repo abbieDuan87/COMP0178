@@ -14,7 +14,16 @@ $my_bids_query = "
     COALESCE(MAX(Bids.bidPrice), Auctions.startingPrice) AS highestBid,
     COUNT(Bids.bidID) AS bidCount,
     Auctions.endDate,
-    COALESCE(UserBids.userBidPrice, Auctions.startingPrice) AS userBidPrice
+    COALESCE(UserBids.userBidPrice, Auctions.startingPrice) AS userBidPrice,
+    CASE
+        WHEN NOW() < Auctions.endDate THEN 'Open'
+        WHEN NOW() >= Auctions.endDate 
+             AND COALESCE(UserBids.userBidPrice, 0) = COALESCE(MAX(Bids.bidPrice), 0) 
+             AND COALESCE(MAX(Bids.bidPrice), 0) >= Auctions.reservePrice THEN 'Won'
+        WHEN NOW() >= Auctions.endDate 
+             AND COALESCE(MAX(Bids.bidPrice), 0) < Auctions.reservePrice THEN 'Reserve Not Met'
+        WHEN NOW() >= Auctions.endDate THEN 'Lost'
+    END AS auctionStatus
 FROM 
     Auctions
 LEFT JOIN 
@@ -51,7 +60,8 @@ $result = execute_query($connection, $my_bids_query);
           $row['highestBid'],
           $row['userBidPrice'],
           $row['bidCount'],
-          new DateTime($row['endDate'])
+          new DateTime($row['endDate']),
+          $row['auctionStatus']
         );
       }
     }
