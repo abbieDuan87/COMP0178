@@ -89,8 +89,8 @@ function print_my_listings_li($item_id, $title, $currentPrice, $num_bids, $end_t
   // Conditional colouring for auction status
   $status_colour = match($auction_status) {
       'Sold' => 'green',
-      'Closed' => 'grey',
-      'Open' => 'black'
+      'Reserve not met' => 'orange',
+      'Open' => 'grey'
   };
 
   // Print HTML
@@ -137,7 +137,7 @@ function print_my_bids_listing($item_id, $title, $highestBid, $userBid, $num_bid
     'Won' => 'green',
     'Lost' => 'red',
     'Open' => 'grey',
-    'Reserve Not Met' => 'orange',
+    'No Sale' => 'orange',
   };
 
   // Print HTML
