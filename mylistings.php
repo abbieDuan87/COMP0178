@@ -33,7 +33,12 @@ include("database.php");
   // Perform a query to pull up their auctions.
   $conn = get_connection();
   $query = "SELECT auctions.*, COUNT(bids.bidID) AS bidCount,
-    COALESCE(MAX(bids.bidPrice), auctions.startingPrice) AS currentPrice
+    COALESCE(MAX(bids.bidPrice), auctions.startingPrice) AS currentPrice,
+    CASE 
+           WHEN NOW() < auctions.endDate THEN 'Open'
+           WHEN NOW() >= auctions.endDate AND COALESCE(MAX(bids.bidPrice), 0) >= auctions.reservePrice THEN 'Sold'
+           WHEN NOW() >= auctions.endDate AND COALESCE(MAX(bids.bidPrice), 0) < auctions.reservePrice THEN 'Closed'
+       END AS auctionStatus
     FROM auctions
     LEFT JOIN bids ON auctions.auctionID = bids.auctionID
     WHERE auctions.sellerID = $seller_id
@@ -59,19 +64,20 @@ include("database.php");
     $auction_result = execute_query($conn, $query);
     if (mysqli_num_rows($auction_result) > 0) {
       while ($row = mysqli_fetch_assoc($auction_result)) {
-        print_listing_li(
+        print_my_listings_li(
           $row['auctionID'],
           $row['title'],
           $row['currentPrice'],
           $row['bidCount'],
-          new DateTime($row['endDate'])
+          new DateTime($row['endDate']),
+          $row['auctionStatus']
         );
       }
     } else {
       echo "<p class='text-center font-weight-light'>
-      No auctions found at the moment.</p>";
+      No listings found at the moment.</p>";
       echo "<div class='text-center'>
-      <a href='create_auction.php' class='btn btn-outline-primary btn-sm'>Start Your Auction</a>
+      <a href='create_auction.php' class='btn btn-outline-primary btn-sm'>Create an Auction</a>
       </div>";
     }
     ?>
