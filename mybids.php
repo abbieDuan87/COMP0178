@@ -21,7 +21,7 @@ $my_bids_query = "
              AND COALESCE(UserBids.userBidPrice, 0) = COALESCE(MAX(Bids.bidPrice), 0) 
              AND COALESCE(MAX(Bids.bidPrice), 0) >= Auctions.reservePrice THEN 'Won'
         WHEN NOW() >= Auctions.endDate 
-             AND COALESCE(MAX(Bids.bidPrice), 0) < Auctions.reservePrice THEN 'Reserve Not Met'
+             AND COALESCE(MAX(Bids.bidPrice), 0) < Auctions.reservePrice THEN 'No Sale'
         WHEN NOW() >= Auctions.endDate THEN 'Lost'
     END AS auctionStatus
 FROM 
