@@ -101,7 +101,15 @@ mysqli_close($connection);
           <div class="col-sm-10">
             <input type="datetime-local" class="form-control" name="auctionEndDate" id="auctionEndDate" required>
           </div>
-        </div>
+        </div> 
+        <script>
+          const endDateInput = document.getElementById('auctionEndDate');
+          const now = new Date();
+          const localDateTime = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
+            .toISOString()
+            .slice(0, 16);
+          endDateInput.setAttribute('min', localDateTime);
+        </script>
         <button type="submit" class="btn btn-primary form-control">Create Auction</button>
       </form>
     </div>
