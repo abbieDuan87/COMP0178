@@ -37,7 +37,7 @@ include("database.php");
     CASE 
            WHEN NOW() < auctions.endDate THEN 'Open'
            WHEN NOW() >= auctions.endDate AND COALESCE(MAX(bids.bidPrice), 0) >= auctions.reservePrice THEN 'Sold'
-           WHEN NOW() >= auctions.endDate AND COALESCE(MAX(bids.bidPrice), 0) < auctions.reservePrice THEN 'Closed'
+           WHEN NOW() >= auctions.endDate AND COALESCE(MAX(bids.bidPrice), 0) < auctions.reservePrice THEN 'Reserve not met'
        END AS auctionStatus
     FROM auctions
     LEFT JOIN bids ON auctions.auctionID = bids.auctionID
