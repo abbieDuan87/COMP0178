@@ -96,13 +96,3 @@ CREATE TABLE Watchlists(
     FOREIGN KEY (auctionID) REFERENCES Auctions(auctionID),
     FOREIGN KEY (buyerID) REFERENCES Buyers(buyerID)
 );
-
-CREATE TABLE EmailQueue (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    recipient VARCHAR(255) NOT NULL,
-    subject VARCHAR(255) NOT NULL,
-    body TEXT NOT NULL,
-    status ENUM('pending', 'sent', 'failed') DEFAULT 'pending',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);

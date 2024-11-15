@@ -59,12 +59,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         if (execute_query($conn, $query)) {
             $_SESSION['success_message'] = 'Your bid has been placed successfully!';
-            // queue the email for success bid for current user
+            // send email to success bid for current user
             if (isset($_SESSION['email']) && !empty($_SESSION['email'])) {
-                queue_email_by_type($conn, $_SESSION['email'], 'successful_bid', ['auction_title' => $auction_title]);
+                send_email_by_type($_SESSION['email'], 'successful_bid', ['auction_title' => $auction_title]);
             }
             // queue the emails for noticing the outbidded users
-            queue_outbid_notifications_email($conn, $item_id, $buyer_id, $bid_price, $auction_title);
+            send_multiple_outbid_email($conn, $item_id, $buyer_id, $bid_price, $auction_title);
         } else {
             $_SESSION['warning_message'] = 'There was an error placing your bid. Please try again.';
         }

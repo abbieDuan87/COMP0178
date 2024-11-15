@@ -50,7 +50,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $buyer_sql = "INSERT INTO buyers (buyerID) VALUES ('$user_id')";
                 execute_query($conn, $buyer_sql);
             }
-            queue_email_by_type($conn, $email, 'registration');
+            send_email_by_type($email, "registration");
             
             header("Location: successful_registration.php");
             exit();

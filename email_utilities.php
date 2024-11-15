@@ -1,75 +1,94 @@
 <?php
 
-// Queue email to the emailqueue database.
-function queue_email_by_type($conn, $recipients, $type, $data = [])
-{
-    // Ensure recipients is an array for consistency
-    if (!is_array($recipients)) {
-        $recipients = [$recipients];
-    }
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
 
-    // Retrieve the email template and replace placeholders
-    $template = get_email_content($type, $data);
-    if ($template) {
-        $subject = $template['subject'];
-        $body = $template['body'];
+require 'PHPMailer/src/PHPMailer.php';
+require 'PHPMailer/src/SMTP.php';
+require 'PHPMailer/src/Exception.php';
 
-        foreach ($recipients as $recipient) {
-            $recipient = mysqli_real_escape_string($conn, $recipient);
-            $subject = mysqli_real_escape_string($conn, $subject);
-            $body = mysqli_real_escape_string($conn, $body);
-            $query = "INSERT INTO EmailQueue (recipient, subject, body, status) VALUES ('$recipient', '$subject', '$body', 'pending')";
-            mysqli_query($conn, $query);
-        }
-    } else {
-        echo "Error: Email type '$type' not found.";
-    }
-}
-
-// Generalised function to send an email by type with custom data
-// Example usage:
-// send_email_by_type('auctioncat@mail.com', 'registration');
-// send_email_by_type('auctioncat@mail.com', 'create_auction', ['auction_title' => 'Vintage Watch']);
-// send_email_by_type('bidder@mail.com', 'outbid_notification', ['auction_title' => 'Vintage Watch']);
-// send_email_by_type('auctioncat@mail.com', 'auction_closed', [
-//     'auction_title' => 'Vintage Watch',
-//     'result_message' => "Congratulations to the winner!"
-// ]);
+// Send email based on template type with PHPMailer
 function send_email_by_type($recipients, $type, $data = [])
 {
-    // Check if $recipients is an array, and join them into a string if necessary
-    if (is_array($recipients)) {
-        $recipients = implode(',', $recipients); // Join multiple recipients with commas
-    }
-
-    // Get email content (subject and body)
     $template = get_email_content($type, $data);
+    send_email($recipients, $template['subject'], $template['body']);
+}
 
-    // If the template exists, send the email
-    if ($template) {
-        return send_email($recipients, $template['subject'], $template['body']);
-    } else {
-        echo "Error: Email type '$type' not found.";
+// Main function to send an email using PHPMailer
+function send_email($recipients, $subject, $body)
+{
+    $config = parse_ini_file('./config.ini');
+    $sender_name = $config['sender_name'];
+    $sender_email = $config['sender_email'];
+    $smtp_host = $config['smtp_host'];
+    $smtp_username = $config['smtp_username'];
+    $smtp_password = $config['smtp_password'];
+    $smtp_port = $config['smtp_port'];
+    $smtp_secure = $config['smtp_secure'];
+
+    $mail = new PHPMailer(true);
+
+    try {
+        // server config
+        $mail->isSMTP();
+        $mail->Host = $smtp_host;
+        $mail->SMTPAuth = true;
+        $mail->Username = $smtp_username;
+        $mail->Password = $smtp_password;
+        $mail->SMTPSecure = $smtp_secure;
+        $mail->Port = $smtp_port;
+
+        // sender info
+        $mail->setFrom($sender_email, $sender_name);
+
+        // Add multiple recipients
+        if (is_array($recipients)) {
+            foreach ($recipients as $email) {
+                $mail->addAddress($email);
+            }
+        } else {
+            $mail->addAddress($recipients); // Add single recipient
+        }
+
+        // email content
+        $mail->isHTML(false);
+        $mail->Subject = $subject;
+        $mail->Body = $body;
+
+        // send email
+        $mail->send();
+        return true;
+    } catch (Exception $e) {
+        echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
         return false;
     }
 }
 
-// Main function to send an email
-function send_email($recipients, $subject, $body)
+// Send email to all bidders who are outbidded - including querying those bidders inside this function
+function send_multiple_outbid_email($conn, $auction_id, $current_bidder_id, $bid_amount, $auction_title)
 {
-    // Configuration for sender details
-    $config = parse_ini_file('./config.ini');
-    $sender_name = $config['sender_name'];
-    $sender_email = $config['sender_email'];
+    // Query to find other bidders who were outbid, excluding the current highest bidder
+    $outbid_query = "
+        SELECT DISTINCT Users.email
+        FROM Bids
+        INNER JOIN Users ON Bids.buyerID = Users.userID
+        WHERE Bids.auctionID = $auction_id
+          AND Bids.buyerID != $current_bidder_id
+          AND Bids.bidPrice < $bid_amount";
 
-    // Email headers
-    $headers = "From: " . $sender_name . " <" . $sender_email . ">\r\n";
-    $headers .= "Reply-To: " . $sender_email . "\r\n";
-    $headers .= "Content-Type: text/plain; charset=UTF-8\r\n";
+    $outbid_result = execute_query($conn, $outbid_query);
 
-    // Send the email (to multiple recipients)
-    $result = mail($recipients, $subject, $body, $headers);
-    return $result;
+    // Collect outbid emails into an array
+    $outbid_emails = [];
+    while ($row = mysqli_fetch_assoc($outbid_result)) {
+        $outbid_emails[] = $row['email'];
+    }
+
+    // Check if there are outbid users to notify
+    if (!empty($outbid_emails)) {
+        // Send a single outbid notification email to all outbid users
+        send_email_by_type($outbid_emails, 'outbid_notification', ['auction_title' => $auction_title]);
+    }
 }
 
 // Function to get and format email template by type with data placeholders
@@ -114,7 +133,6 @@ function get_email_content($type, $data = [])
         ]
     ];
 
-    // Retrieve the template and replace placeholders with actual data
     $template = $templates[$type] ?? null;
     if ($template) {
         foreach ($data as $key => $value) {
@@ -123,32 +141,4 @@ function get_email_content($type, $data = [])
         }
     }
     return $template;
-}
-
-/**
- * Queue outbid notification emails for users who were outbid in an auction.
- *
- * @param mysqli $conn Database connection
- * @param int $auction_id ID of the auction
- * @param int $current_bidder_id ID of the current bidder who placed a higher bid
- * @param float $bid_amount The amount of the current bid
- * @param string $auction_title Title of the auction item
- */
-function queue_outbid_notifications_email($conn, $auction_id, $current_bidder_id, $bid_amount, $auction_title)
-{
-    // Query to find other bidders who were outbid
-    $outbid_query = "
-        SELECT DISTINCT Users.email
-        FROM Bids
-        INNER JOIN Users ON Bids.buyerID = Users.userID
-        WHERE Bids.auctionID = $auction_id
-          AND Bids.buyerID != $current_bidder_id
-          AND Bids.bidPrice < $bid_amount";
-
-    $outbid_result = execute_query($conn, $outbid_query);
-
-    while ($row = mysqli_fetch_assoc($outbid_result)) {
-        $outbid_email = $row['email'];
-        queue_email_by_type($conn, $outbid_email, 'outbid_notification', ['auction_title' => $auction_title]);
-    }
 }

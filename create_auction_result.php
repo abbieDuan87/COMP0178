@@ -72,9 +72,9 @@ $sql = "INSERT INTO Auctions (categoryID, sellerID, title, description, createdD
         // Get the ID of the newly inserted record
         $inserted_id = mysqli_insert_id($connection);
         
-        // Add the successful email to emailQueue
+        // Send successful email to seller.
         if (isset($_SESSION['email']) && !empty($_SESSION['email'])) {
-            queue_email_by_type($connection, $_SESSION['email'], "create_auction", ['auction_title' => $title]);
+            send_email_by_type($_SESSION['email'], "create_auction", ['auction_title' => $title]);
         }
 
         // Redirect to listing.php with the item_id as a URL parameter
