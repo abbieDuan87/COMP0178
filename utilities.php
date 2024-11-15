@@ -115,10 +115,10 @@ function print_my_listings_li($item_id, $title, $currentPrice, $num_bids, $end_t
 
 // print_my_bids_listing:
 // specifically for the "My Bids" page, showing both the highest bid and the user's bid.
-function print_my_bids_listing($item_id, $title, $highestBid, $userBid, $num_bids, $end_time)
+function print_my_bids_listing($item_id, $title, $highestBid, $userBid, $num_bids, $end_time, $auctionStatus)
 {
   // Fix language of bid vs. bids
-  if ($num_bids = 1) {
+  if ($num_bids == 1) {
     $bid = ' bid';
   } else {
     $bid = ' bids';
@@ -133,6 +133,13 @@ function print_my_bids_listing($item_id, $title, $highestBid, $userBid, $num_bid
     $time_remaining = display_time_remaining($time_to_end) . ' remaining';
   }
 
+   $status_colour = match($auctionStatus) {
+    'Won' => 'green',
+    'Lost' => 'red',
+    'Open' => 'grey',
+    'Reserve Not Met' => 'orange',
+  };
+
   // Print HTML
   echo (
     "
@@ -146,9 +153,10 @@ function print_my_bids_listing($item_id, $title, $highestBid, $userBid, $num_bid
             <div class='col'>
               <span style='font-size: 1.4em' class='font-weight-bolder'>£" . number_format($highestBid, 2) . "</span>
               <div class='text-muted'>Your bid: £" . number_format($userBid, 2) . "</div>
+              <div class='mt-1'>{$num_bids} <span>{$bid}</span></div>
             </div>
             <div class='col'>
-              <div class='mt-1'>{$num_bids} <span>{$bid}</span></div>
+            <div class= 'font-weight-bold mt-2'> Status:<span style='color:{$status_colour}'> {$auctionStatus}</span></div>
               <div class='text-muted'>{$time_remaining}</div>
             </div>
           </div>
