@@ -326,3 +326,123 @@ function display_bid_form($item_id)
     echo "<div class='text-center text-muted mt-1'>Interested in this item? <br> Log in as a buyer to make your bid!</div>";
   }
 }
+
+/**
+ * Constructs a SQL query to retrieve auction listings for recommendation.
+ * The recommendations are based on auctions-based collaborative filtering. assuming users would like to explore
+ * other auctions of the same categories as the ones they bid on, but have not bid on yet.
+ * @param int $user_id The userID to recommend auctions for
+ * @param boolean $count_mode Whether the result sql is to count the number of auctions or retrieving acution detail
+ * @return array An array containing:
+ *                 - The generated SQL query string.
+ *                 - An array of parameters for the query.
+ *                 - A string of parameter types for prepared statements.
+ */
+function get_recommended_auctions_sql($user_id, $count_mode)
+{
+  $query_auctions_select_clause = "
+        SELECT 
+            a.auctionID,
+            a.title,
+            COALESCE(MAX(b.bidPrice), a.startingPrice) AS currentPrice,
+            COUNT(b.bidID) AS bidCount,
+            a.endDate
+   ";
+  $count_select_clause = "SELECT COUNT(DISTINCT a.auctionID) AS total ";
+  // Choose the SELECT clause based on count mode
+  $result_sql = $count_mode ? $count_select_clause : $query_auctions_select_clause;
+  // Add auctions-based collaborative filtering, choosing live auctions of the same categories the user has bid on
+  $result_sql .= "
+        FROM 
+            Auctions a
+        JOIN 
+            Categories c ON a.categoryID = c.categoryID
+        LEFT JOIN 
+            Bids b ON a.auctionID = b.auctionID
+        WHERE 
+            a.categoryID IN (
+                SELECT DISTINCT
+                    a.categoryID
+                FROM 
+                    Bids b
+                JOIN 
+                    Auctions a ON b.auctionID = a.auctionID
+                WHERE 
+                    b.buyerID = ?  -- User's previous bids
+            )
+            AND a.auctionStatus = TRUE  -- Only ongoing auctions
+            AND a.endDate > NOW()       -- Auction must not have ended yet
+            AND a.auctionID NOT IN (    -- Exclude auctions the user has already bid on
+                SELECT auctionID
+                FROM Bids
+                WHERE buyerID = ?
+            )
+  ";
+  // if not for counting, the query result needs to be aggregated, and ordered with auctions ending soon placed in the front
+  if (!$count_mode) {
+    $result_sql .= "
+        GROUP BY 
+            a.auctionID, a.title, a.endDate
+        ORDER BY 
+            a.endDate ASC
+      ";
+  }
+  return [$result_sql, [$user_id, $user_id], 'ii'];
+}
+
+/**
+ * Constructs a SQL query to retrieve popular live auctions based on bid count.
+ * The recommendations exclude auctions the user has already bid on.
+ *
+ * @param int $user_id The userID to recommend auctions for
+ * @param boolean $count_mode Whether the result SQL is to count the number of auctions or retrieving auction details
+ * @return array An array containing:
+ *                 - The generated SQL query string.
+ *                 - An array of parameters for the query.
+ *                 - A string of parameter types for prepared statements.
+ */
+function get_popular_auctions_sql($user_id, $count_mode)
+{
+    $query_auctions_select_clause = "
+        SELECT 
+            a.auctionID,
+            a.title,
+            COALESCE(MAX(b.bidPrice), a.startingPrice) AS currentPrice,
+            COUNT(b.bidID) AS bidCount,
+            a.endDate
+    ";
+    $count_select_clause = "SELECT COUNT(DISTINCT a.auctionID) AS total ";
+
+    // Choose the SELECT clause based on count mode
+    $result_sql = $count_mode ? $count_select_clause : $query_auctions_select_clause;
+
+    // Add the logic for retrieving popular live auctions
+    $result_sql .= "
+        FROM 
+            Auctions a
+        LEFT JOIN 
+            Bids b ON a.auctionID = b.auctionID
+        WHERE 
+            a.auctionStatus = TRUE  -- Only ongoing auctions
+            AND a.endDate > NOW()   -- Auction must not have ended yet
+            AND a.auctionID NOT IN (    -- Exclude auctions the user has already bid on
+                SELECT auctionID
+                FROM Bids
+                WHERE buyerID = ?
+            )
+    ";
+
+    // If not in count mode, aggregate results and order by bid count
+    if (!$count_mode) {
+        $result_sql .= "
+        GROUP BY 
+            a.auctionID, a.title, a.endDate
+        ORDER BY 
+            bidCount DESC, a.endDate ASC  -- Most popular auctions first, tiebreaker is soonest ending
+        ";
+    }
+
+    // Return the final query, parameters, and parameter types
+    return [$result_sql, [$user_id], 'i'];
+}
+
