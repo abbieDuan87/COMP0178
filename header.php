@@ -30,20 +30,18 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-light mx-2">
   <a class="navbar-brand" href="#">Site Name <!--CHANGEME!--></a>
   <ul class="navbar-nav ml-auto">
-    <li class="nav-item">
-    
-<?php
-  // Displays either login or logout on the right, depending on user's
-  // current status (session).
-  if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) {
-    echo '<a class="nav-link" href="logout.php">Logout</a>';
-  }
-  else {
-    echo '<button type="button" class="btn nav-link" data-toggle="modal" data-target="#loginModal">Login</button>';
-  }
-?>
-
-    </li>
+    <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true): ?>
+      <li class="nav-item">
+        <a class="nav-link" href="user_settings.php">Settings</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="logout.php">Logout</a>
+      </li>
+    <?php else: ?>
+      <li class="nav-item">
+        <button type="button" class="btn nav-link" data-toggle="modal" data-target="#loginModal">Login</button>
+      </li>
+    <?php endif; ?>
   </ul>
 </nav>
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
