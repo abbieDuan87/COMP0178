@@ -23,7 +23,7 @@ if (!is_numeric($starting_price)) {
     $errors[] = "Starting price must be a valid number.";
 }
 
-$reserve_price = isset($_POST["auctionReservePrice"]) && is_numeric($_POST["auctionReservePrice"]) ? $_POST["auctionReservePrice"] : "NULL";
+$reserve_price = isset($_POST["auctionReservePrice"]) && is_numeric($_POST["auctionReservePrice"]) ? $_POST["auctionReservePrice"] : 0;
 
 $uploadDir = 'uploads/';
 $imagePath = 'uploads/bread.png';
