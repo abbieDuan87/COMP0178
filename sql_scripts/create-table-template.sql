@@ -60,7 +60,7 @@ CREATE TABLE Auctions (
     createdDate DATETIME NOT NULL, 
     endDate DATETIME NOT NULL,
     startingPrice FLOAT NOT NULL,
-    reservePrice FLOAT,
+    reservePrice FLOAT NOT NULL DEFAULT 0,
     itemImage VARCHAR(255) NOT NULL,
     auctionStatus BOOLEAN NOT NULL,
     itemCondition ENUM('new', 'good', 'used') NOT NULL,
