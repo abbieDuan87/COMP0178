@@ -90,7 +90,8 @@ function print_my_listings_li($item_id, $title, $currentPrice, $num_bids, $end_t
   $status_colour = match($auction_status) {
       'Sold' => 'green',
       'Reserve not met' => 'orange',
-      'Open' => 'grey'
+      'Open' => 'grey',
+      'Closed - No bids' => 'black'
   };
 
   // Print HTML
