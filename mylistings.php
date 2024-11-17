@@ -36,6 +36,7 @@ include("database.php");
     COALESCE(MAX(bids.bidPrice), auctions.startingPrice) AS currentPrice,
     CASE 
            WHEN NOW() < auctions.endDate THEN 'Open'
+           WHEN NOW() >= Auctions.endDate AND COUNT(Bids.bidID) = 0 THEN 'Closed - No bids'
            WHEN NOW() >= auctions.endDate AND COALESCE(MAX(bids.bidPrice), 0) >= auctions.reservePrice THEN 'Sold'
            WHEN NOW() >= auctions.endDate AND COALESCE(MAX(bids.bidPrice), 0) < auctions.reservePrice THEN 'Reserve not met'
        END AS auctionStatus
