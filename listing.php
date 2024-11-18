@@ -1,4 +1,4 @@
-<?php 
+<?php
 include_once("header.php");
 require("utilities.php");
 require("database.php");
@@ -63,8 +63,9 @@ if ($now < $end_time) {
 }
 
 $has_session = session_status() == PHP_SESSION_ACTIVE ? true : false;
-$watching = false;
 
+$can_watchlist = isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true && isset($_SESSION['account_type']) && $_SESSION['account_type'] === 'buyer';
+$watching = $can_watchlist ? check_is_watching($connection, $item_id, $_SESSION['user_id']) : false;
 ?>
 
 <div class="container">
@@ -75,9 +76,11 @@ $watching = false;
     </div>
     <div class="col-sm-4 align-self-center"> <!-- Right col -->
       <?php if ($now < $end_time): ?>
-        <div id="watch_nowatch" <?php if ($has_session && $watching) echo 'style="display: none"'; ?>>
-          <button type="button" class="btn btn-outline-secondary btn-sm" onclick="addToWatchlist()">+ Add to watchlist</button>
-        </div>
+        <?php if ($can_watchlist): ?>
+          <div id="watch_nowatch" <?php if ($has_session && $watching) echo 'style="display: none"'; ?>>
+            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="addToWatchlist()">+ Add to watchlist</button>
+          </div>
+        <?php endif; ?>
         <div id="watch_watching" <?php if (!$has_session || !$watching) echo 'style="display: none"'; ?>>
           <button type="button" class="btn btn-success btn-sm" disabled>Watching</button>
           <button type="button" class="btn btn-danger btn-sm" onclick="removeFromWatchlist()">Remove watch</button>

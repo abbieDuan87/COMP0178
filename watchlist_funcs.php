@@ -1,27 +1,41 @@
  <?php
 
-if (!isset($_POST['functionname']) || !isset($_POST['arguments'])) {
-  return;
-}
+  include_once('utilities.php');
+  include_once('database.php');
 
-// Extract arguments from the POST variables:
-$item_id = $_POST['arguments'];
+  if (!isset($_POST['functionname']) || !isset($_POST['arguments'])) {
+    return;
+  }
 
-if ($_POST['functionname'] == "add_to_watchlist") {
-  // TODO: Update database and return success/failure.
+  session_start();
 
-  $res = "success";
-}
-else if ($_POST['functionname'] == "remove_from_watchlist") {
-  // TODO: Update database and return success/failure.
+  if (empty($_SESSION['logged_in']) || $_SESSION['account_type'] !== 'buyer') {
+    return;
+  }
 
-  $res = "success";
-}
+  $user_id = (int)$_SESSION['user_id'];
+  $item_id = (int)$_POST['arguments'][0];
+  $conn = get_connection();
 
-// Note: Echoing from this PHP function will return the value as a string.
-// If multiple echo's in this file exist, they will concatenate together,
-// so be careful. You can also return JSON objects (in string form) using
-// echo json_encode($res).
-echo $res;
+  if ($_POST['functionname'] == "add_to_watchlist") {
+    $add_watchlist_sql = "INSERT INTO Watchlists (buyerID, auctionID) VALUES ($user_id, $item_id)";
+    $add_result = execute_query($conn, $add_watchlist_sql);
+    if ($add_result) {
+      $res = "success";
+    } else {
+      $res = "error";
+    }
+  } else if ($_POST['functionname'] == "remove_from_watchlist") {
+    $remove_watchlist_sql = "DELETE FROM Watchlists WHERE buyerID = $user_id AND auctionID = $item_id";
+    $remove_result = execute_query($conn, $remove_watchlist_sql);
+    if ($remove_result) {
+      $res = "success";
+    } else {
+      $res = "error";
+    }
+  }
 
-?>
+  close_connection($conn);
+  echo $res;
+
+  ?>

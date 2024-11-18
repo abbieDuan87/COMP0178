@@ -87,15 +87,15 @@ function print_my_listings_li($item_id, $title, $currentPrice, $num_bids, $end_t
   }
 
   // Conditional colouring for auction status
-  $status_colour = match($auction_status) {
-      'Sold' => 'green',
-      'Reserve not met' => 'orange',
-      'Open' => 'grey',
-      'Closed - No bids' => 'black'
+  $status_colour = match ($auction_status) {
+    'Sold' => 'green',
+    'Reserve not met' => 'orange',
+    'Open' => 'grey',
+    'Closed - No bids' => 'black'
   };
 
   // Print HTML
-     echo "
+  echo "
     <li class='list-group-item'>
         <div class='row ml-1 mt-2 mb-1'>
             <div class='col-4'>
@@ -134,7 +134,7 @@ function print_my_bids_listing($item_id, $title, $highestBid, $userBid, $num_bid
     $time_remaining = display_time_remaining($time_to_end) . ' remaining';
   }
 
-   $status_colour = match($auctionStatus) {
+  $status_colour = match ($auctionStatus) {
     'Won' => 'green',
     'Closed' => 'black',
     'Open' => 'grey'
@@ -329,21 +329,21 @@ function render_bid_history_table($bid_history_result, $starting_price, $created
       </tr>
     </thead>
     <tbody>
-      <?php 
-      if (mysqli_num_rows($bid_history_result) > 0): 
+      <?php
+      if (mysqli_num_rows($bid_history_result) > 0):
         // Fetch the first (latest) bid
-        $is_first_row = true; 
-        while ($row = mysqli_fetch_assoc($bid_history_result)): 
+        $is_first_row = true;
+        while ($row = mysqli_fetch_assoc($bid_history_result)):
       ?>
           <tr class="border <?php echo $is_first_row ? 'font-weight-bold' : ''; ?>">
             <td><?php echo htmlspecialchars(mask_username($row['username'])); ?></td>
             <td><?php echo htmlspecialchars(format_price($row['bidPrice'])); ?></td>
             <td><?php echo htmlspecialchars($row['bidDate']); ?></td>
           </tr>
-          <?php 
+        <?php
           // Once we hit the first row (latest bid), set $is_first_row to false
           $is_first_row = false;
-          endwhile; 
+        endwhile;
         ?>
         <tr class="border">
           <td>Starting Price</td>
@@ -460,7 +460,7 @@ function get_recommended_auctions_sql($user_id, $count_mode)
  */
 function get_popular_auctions_sql($user_id, $count_mode)
 {
-    $query_auctions_select_clause = "
+  $query_auctions_select_clause = "
         SELECT 
             a.auctionID,
             a.title,
@@ -468,13 +468,13 @@ function get_popular_auctions_sql($user_id, $count_mode)
             COUNT(b.bidID) AS bidCount,
             a.endDate
     ";
-    $count_select_clause = "SELECT COUNT(DISTINCT a.auctionID) AS total ";
+  $count_select_clause = "SELECT COUNT(DISTINCT a.auctionID) AS total ";
 
-    // Choose the SELECT clause based on count mode
-    $result_sql = $count_mode ? $count_select_clause : $query_auctions_select_clause;
+  // Choose the SELECT clause based on count mode
+  $result_sql = $count_mode ? $count_select_clause : $query_auctions_select_clause;
 
-    // Add the logic for retrieving popular live auctions
-    $result_sql .= "
+  // Add the logic for retrieving popular live auctions
+  $result_sql .= "
         FROM 
             Auctions a
         LEFT JOIN 
@@ -489,17 +489,27 @@ function get_popular_auctions_sql($user_id, $count_mode)
             )
     ";
 
-    // If not in count mode, aggregate results and order by bid count
-    if (!$count_mode) {
-        $result_sql .= "
+  // If not in count mode, aggregate results and order by bid count
+  if (!$count_mode) {
+    $result_sql .= "
         GROUP BY 
             a.auctionID, a.title, a.endDate
         ORDER BY 
             bidCount DESC, a.endDate ASC  -- Most popular auctions first, tiebreaker is soonest ending
         ";
-    }
+  }
 
-    // Return the final query, parameters, and parameter types
-    return [$result_sql, [$user_id], 'i'];
+  // Return the final query, parameters, and parameter types
+  return [$result_sql, [$user_id], 'i'];
 }
 
+function check_is_watching($connection, $auction_id, $user_id)
+{
+  $watcher_query = "SELECT 1 FROM Watchlists WHERE buyerID = $user_id AND auctionID = $auction_id LIMIT 1";
+  $watcher_result = execute_query($connection, $watcher_query);
+
+  if (mysqli_num_rows($watcher_result) > 0) {
+    return true;
+  }
+  return false;
+}
