@@ -136,9 +136,8 @@ function print_my_bids_listing($item_id, $title, $highestBid, $userBid, $num_bid
 
    $status_colour = match($auctionStatus) {
     'Won' => 'green',
-    'Lost' => 'red',
-    'Open' => 'grey',
-    'Reserve Not Met' => 'orange',
+    'Closed' => 'black',
+    'Open' => 'grey'
   };
 
   // Print HTML
