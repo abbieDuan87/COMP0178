@@ -92,7 +92,7 @@ CREATE TABLE Orders(
 
 CREATE TABLE Watchlists(
     buyerID INT NOT NULL,
-    auctionID INT NULL NULL,
+    auctionID INT NOT NULL,
     FOREIGN KEY (auctionID) REFERENCES Auctions(auctionID),
     FOREIGN KEY (buyerID) REFERENCES Buyers(buyerID)
 );
