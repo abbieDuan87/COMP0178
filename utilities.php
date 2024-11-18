@@ -25,7 +25,7 @@ function print_listing_li($item_id, $title, $currentPrice, $num_bids, $end_time)
 {
 
   // Fix language of bid vs. bids
-  if ($num_bids = 1) {
+  if ($num_bids == 1) {
     $bid = ' bid';
   } else {
     $bid = ' bids';
@@ -64,12 +64,62 @@ function print_listing_li($item_id, $title, $currentPrice, $num_bids, $end_time)
   );
 }
 
+// print_mylisting_li:
+// This function prints an HTML <li> element containing an auction listing
+function print_my_listings_li($item_id, $title, $currentPrice, $num_bids, $end_time, $auction_status)
+{
+
+  // Fix language of bid vs. bids
+  if ($num_bids == 1) {
+    $bid = ' bid';
+  } else {
+    $bid = ' bids';
+  }
+
+  // Calculate time to auction end
+  $now = new DateTime();
+  if ($now > $end_time) {
+    $time_remaining = 'This auction has ended';
+  } else {
+    // Get interval:
+    $time_to_end = date_diff($now, $end_time);
+    $time_remaining = display_time_remaining($time_to_end) . ' remaining';
+  }
+
+  // Conditional colouring for auction status
+  $status_colour = match($auction_status) {
+      'Sold' => 'green',
+      'Reserve not met' => 'orange',
+      'Open' => 'grey',
+      'Closed - No bids' => 'black'
+  };
+
+  // Print HTML
+     echo "
+    <li class='list-group-item'>
+        <div class='row ml-1 mt-2 mb-1'>
+            <div class='col-4'>
+                <h5><a href='listing.php?item_id={$item_id}'>{$title}</a></h5>
+            </div>
+            <div class='col-3'>
+                <span style='font-size: 1.4em' class='font-weight-bolder'>£" . number_format($currentPrice, 2) . "</span>
+                <div class='mt-1'>{$num_bids}{$bid}</div>
+            </div>
+            <div class='col-3'>
+                <div class = 'font-weight-bold mt-2'>Status:<span style='color:{$status_colour}'> {$auction_status}</span></div>
+                <div class='text-muted mt-1'>{$time_remaining}</div>
+            </div>
+        </div>
+    </li>
+    ";
+}
+
 // print_my_bids_listing:
 // specifically for the "My Bids" page, showing both the highest bid and the user's bid.
-function print_my_bids_listing($item_id, $title, $highestBid, $userBid, $num_bids, $end_time)
+function print_my_bids_listing($item_id, $title, $highestBid, $userBid, $num_bids, $end_time, $auctionStatus)
 {
   // Fix language of bid vs. bids
-  if ($num_bids = 1) {
+  if ($num_bids == 1) {
     $bid = ' bid';
   } else {
     $bid = ' bids';
@@ -84,6 +134,12 @@ function print_my_bids_listing($item_id, $title, $highestBid, $userBid, $num_bid
     $time_remaining = display_time_remaining($time_to_end) . ' remaining';
   }
 
+   $status_colour = match($auctionStatus) {
+    'Won' => 'green',
+    'Closed' => 'black',
+    'Open' => 'grey'
+  };
+
   // Print HTML
   echo (
     "
@@ -97,9 +153,10 @@ function print_my_bids_listing($item_id, $title, $highestBid, $userBid, $num_bid
             <div class='col'>
               <span style='font-size: 1.4em' class='font-weight-bolder'>£" . number_format($highestBid, 2) . "</span>
               <div class='text-muted'>Your bid: £" . number_format($userBid, 2) . "</div>
+              <div class='mt-1'>{$num_bids} <span>{$bid}</span></div>
             </div>
             <div class='col'>
-              <div class='mt-1'>{$num_bids} <span>{$bid}</span></div>
+            <div class= 'font-weight-bold mt-2'> Status:<span style='color:{$status_colour}'> {$auctionStatus}</span></div>
               <div class='text-muted'>{$time_remaining}</div>
             </div>
           </div>
