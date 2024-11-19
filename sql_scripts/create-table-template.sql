@@ -25,13 +25,12 @@ CREATE TABLE Buyers(
 
 CREATE TABLE Addresses(
     addressID INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-    userID INT NOT NULL,
+    userID INT NOT NULL UNIQUE,
     street VARCHAR(255) NOT NULL,
     city VARCHAR(255) NOT NULL,
     postcode VARCHAR(255) NOT NULL,
-    FOREIGN KEY (userID) REFERENCES Users(userID)
+    FOREIGN KEY (userID) REFERENCES Users(userID) ON DELETE CASCADE
 );
-
 
 CREATE TABLE Categories (
     categoryID INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
@@ -76,18 +75,6 @@ CREATE TABLE Bids(
     isSuccessful BOOLEAN NOT NULL,
     FOREIGN KEY (auctionID) REFERENCES Auctions(auctionID),
     FOREIGN KEY (buyerID) REFERENCES Buyers(buyerID)
-);
-
-CREATE TABLE Orders(
-    orderID INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-    auctionID INT NOT NULL,
-    buyerID INT NOT NULL,
-    sellerID INT NOT NULL,
-    orderDate DATETIME NOT NULL,
-    orderStatus ENUM('placed', 'dispatched', 'delivered'),
-    FOREIGN KEY (auctionID) REFERENCES Auctions(auctionID),
-    FOREIGN KEY (buyerID) REFERENCES Buyers(buyerID),
-    FOREIGN KEY (sellerID) REFERENCES sellers(sellerID)
 );
 
 CREATE TABLE Watchlists(
