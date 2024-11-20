@@ -24,10 +24,10 @@ $user_data = $stmt->get_result()->fetch_assoc();
 close_connection($conn);
 
 $user = [
-    'username' => $user_data['username'] ?? '',
-    'firstName' => $user_data['firstName'] ?? '',
-    'lastName' => $user_data['lastName'] ?? '',
-    'email' => $user_data['email'] ?? ''
+    'username' => $user_data['username'],
+    'firstName' => $user_data['firstName'],
+    'lastName' => $user_data['lastName'],
+    'email' => $user_data['email']
 ];
 $address = [
     'street' => $user_data['street'] ?? '',
