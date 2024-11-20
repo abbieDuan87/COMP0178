@@ -4,6 +4,8 @@ include_once("database.php");
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $user_id = $_SESSION['user_id'];
+    $conn = get_connection();
+    $errors = [];
 
     $username = trim($_POST['username']);
     $first_name = trim($_POST['firstName']);
@@ -14,22 +16,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $postcode = trim($_POST['postcode']);
     $password = trim($_POST['password']);
 
-    $conn = get_connection();
-
-    $errors = [];
-
-    if (empty($username)) $errors[] = "Username is required.";
-    if (empty($first_name)) $errors[] = "First name is required.";
-    if (empty($last_name)) $errors[] = "Last name is required.";
-    if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) $errors[] = "A valid email is required.";
-
     $query = "SELECT userID FROM Users WHERE (username = ? OR email = ?) AND userID != ?";
     $stmt = $conn->prepare($query);
     $stmt->bind_param("ssi", $username, $email, $user_id);
     $stmt->execute();
-    $result = $stmt->get_result();
-
-    if ($result->num_rows > 0) {
+    if ($stmt->get_result()->num_rows > 0) {
         $errors[] = "Username or email is already taken.";
     }
 
@@ -56,7 +47,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $types .= "i";
 
     $stmt = $conn->prepare($query);
-    if (!$stmt->bind_param($types, ...$params)) {
+    if (!$stmt->bind_param($types, ...$params)) {        
         echo "Error binding parameters: " . $stmt->error;
         exit();
     }
