@@ -1,11 +1,10 @@
 <?php
-  session_start();
-  if (!isset($_SESSION['logged_in'])) {
+session_start();
+if (!isset($_SESSION['logged_in'])) {
     $_SESSION['logged_in'] = false;
     $_SESSION['account_type'] = 'guest';
 }
 ?>
-
 
 <!doctype html>
 <html lang="en">
@@ -34,6 +33,11 @@
       <li class="nav-item">
         <a class="nav-link" href="user_settings.php">Settings</a>
       </li>
+      <?php if ($_SESSION['account_type'] == 'buyer'): ?>
+        <li class="nav-item">
+          <a class="nav-link" href="watchlist.php">My Watchlist</a>
+        </li>
+      <?php endif; ?>
       <li class="nav-item">
         <a class="nav-link" href="logout.php">Logout</a>
       </li>
@@ -44,31 +48,28 @@
     <?php endif; ?>
   </ul>
 </nav>
+
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
   <ul class="navbar-nav align-middle">
-	<li class="nav-item mx-1">
+    <li class="nav-item mx-1">
       <a class="nav-link" href="browse.php">Browse</a>
     </li>
-<?php
-  if (isset($_SESSION['account_type']) && $_SESSION['account_type'] == 'buyer') {
-  echo('
-	<li class="nav-item mx-1">
-      <a class="nav-link" href="mybids.php">My Bids</a>
-    </li>
-	<li class="nav-item mx-1">
-      <a class="nav-link" href="recommendations.php">Recommended</a>
-    </li>');
-  }
-  if (isset($_SESSION['account_type']) && $_SESSION['account_type'] == 'seller') {
-  echo('
-	<li class="nav-item mx-1">
-      <a class="nav-link" href="mylistings.php">My Listings</a>
-    </li>
-	<li class="nav-item ml-3">
-      <a class="nav-link btn border-light" href="create_auction.php">+ Create auction</a>
-    </li>');
-  }
-?>
+    <?php if (isset($_SESSION['account_type']) && $_SESSION['account_type'] == 'buyer'): ?>
+      <li class="nav-item mx-1">
+        <a class="nav-link" href="mybids.php">My Bids</a>
+      </li>
+      <li class="nav-item mx-1">
+        <a class="nav-link" href="recommendations.php">Recommended</a>
+      </li>
+    <?php endif; ?>
+    <?php if (isset($_SESSION['account_type']) && $_SESSION['account_type'] == 'seller'): ?>
+      <li class="nav-item mx-1">
+        <a class="nav-link" href="mylistings.php">My Listings</a>
+      </li>
+      <li class="nav-item ml-3">
+        <a class="nav-link btn border-light" href="create_auction.php">+ Create auction</a>
+      </li>
+    <?php endif; ?>
   </ul>
 </nav>
 
