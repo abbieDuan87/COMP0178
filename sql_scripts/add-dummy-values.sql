@@ -53,15 +53,6 @@ VALUES
     (4, 3, 1850, '2024-01-10 10:30:00', TRUE),
     (4, 4, 2000, '2024-01-11 16:00:00', FALSE);
 
-    
-
--- Insert Orders (linked to auctions, buyers, sellers)
-INSERT INTO Orders (auctionID, buyerID, sellerID, orderDate, orderStatus)
-VALUES 
-    (1, 3, 1, '2024-01-11 12:00:00', 'placed'),
-    (2, 3, 1, '2024-01-16 09:00:00', 'dispatched'),
-    (3, 4, 2, '2024-01-13 15:00:00', 'delivered');
-
 -- Insert Watchlists (linked to buyers and auctions)
 INSERT INTO Watchlists (buyerID, auctionID)
 VALUES 

@@ -24,6 +24,10 @@ $result_address = $stmt_address->get_result();
 $address = $result_address->fetch_assoc();
 
 close_connection($conn);
+
+$street = $address['street'] ?? '';
+$city = $address['city'] ?? '';
+$postcode = $address['postcode'] ?? '';
 ?>
 
 <?php if (!empty($errors)): ?>
@@ -64,15 +68,15 @@ close_connection($conn);
         </div>
         <div class="form-group">
             <label for="street">Street</label>
-            <input type="text" class="form-control" id="street" name="street" placeholder="Street">
+            <input type="text" class="form-control" id="street" name="street" value="<?= htmlspecialchars($street) ?>">
         </div>
         <div class="form-group">
             <label for="city">City</label>
-            <input type="text" class="form-control" id="city" name="city" placeholder="City">
+            <input type="text" class="form-control" id="city" name="city" value="<?= htmlspecialchars($city) ?>">
         </div>
         <div class="form-group">
             <label for="postcode">Postcode</label>
-            <input type="text" class="form-control" id="postcode" name="postcode" placeholder="Postcode">
+            <input type="text" class="form-control" id="postcode" name="postcode" value="<?= htmlspecialchars($postcode) ?>">
         </div>
         <div class="form-group">
             <label for="password">New Password (leave blank to keep current password)</label>
