@@ -8,9 +8,9 @@ CREATE TABLE Users(
     userID INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
     firstName VARCHAR(255) NOT NULL,
     lastName VARCHAR(255) NOT NULL,
-    email VARCHAR(255) NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
     username VARCHAR(255) UNIQUE NOT NULL,
-    password VARCHAR(255) UNIQUE NOT NULL
+    password VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE Sellers(
@@ -55,7 +55,7 @@ CREATE TABLE Auctions (
     categoryID INT NOT NULL,
     sellerID INT NOT NULL,
     title VARCHAR(255) NOT NULL,
-    description VARCHAR(255), 
+    description LONGTEXT, 
     createdDate DATETIME NOT NULL, 
     endDate DATETIME NOT NULL,
     startingPrice FLOAT NOT NULL,
@@ -63,7 +63,8 @@ CREATE TABLE Auctions (
     itemImage VARCHAR(255) NOT NULL,
     auctionStatus BOOLEAN NOT NULL,
     itemCondition ENUM('new', 'good', 'used') NOT NULL,
-    FOREIGN KEY (categoryID) REFERENCES Categories(categoryID)
+    FOREIGN KEY (categoryID) REFERENCES Categories(categoryID),
+    FOREIGN KEY (sellerID) REFERENCES Sellers(sellerID)
 );
 
 CREATE TABLE Bids(
