@@ -47,16 +47,17 @@ include("database.php");
 
   $count_sql = "SELECT COUNT(DISTINCT auctions.auctionID) AS total
               FROM auctions
-              LEFT JOIN bids on auctions.auctionID = bids.auctionID
               WHERE auctions.sellerID = $seller_id";
 
   // Variables for pagination
-  $results_per_page = 6;
+  $results_per_page = 6;  
   $offset = ($curr_page - 1) * $results_per_page;
 
   $count_result = execute_query($conn, $count_sql);
   $num_results = mysqli_fetch_assoc($count_result)['total'];
   $max_page = ceil($num_results / $results_per_page);
+
+  $query .= " LIMIT $results_per_page OFFSET $offset"
   ?>
 
   <ul class="list-group">
