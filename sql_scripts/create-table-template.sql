@@ -78,9 +78,10 @@ CREATE TABLE Bids(
     FOREIGN KEY (buyerID) REFERENCES Buyers(buyerID)
 );
 
-CREATE TABLE Watchlists(
+CREATE TABLE Watchlists (
     buyerID INT NOT NULL,
     auctionID INT NOT NULL,
-    FOREIGN KEY (auctionID) REFERENCES Auctions(auctionID),
-    FOREIGN KEY (buyerID) REFERENCES Buyers(buyerID)
+    PRIMARY KEY (buyerID, auctionID),
+    FOREIGN KEY (buyerID) REFERENCES Buyers(buyerID) ON DELETE CASCADE,
+    FOREIGN KEY (auctionID) REFERENCES Auctions(auctionID) ON DELETE CASCADE
 );
