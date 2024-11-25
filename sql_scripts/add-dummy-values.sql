@@ -109,16 +109,7 @@ VALUES
 (9, 1, 'Media 5', 'Vinyl record of classic rock album.', '2024-05-25 14:00:00', '2025-01-18 14:00:00', 60, 80, TRUE, 'good', 'uploads/bread.png'),
 (9, 2, 'Media 6', 'Audio course on language learning.', '2024-06-30 15:00:00', '2025-03-01 15:00:00', 40, 50, TRUE, 'new', 'uploads/bread.png'),
 (9, 1, 'Media 7', 'Box set of popular TV series.', '2024-07-20 16:00:00', '2025-01-25 16:00:00', 100, 150, TRUE, 'used', 'uploads/bread.png'),
-(9, 2, 'Media 8', 'Collector’s edition comic book.', '2024-08-25 17:00:00', '2025-01-30 17:00:00', 120, 150, TRUE, 'new', 'uploads/bread.png'),
--- Others
-(10, 1, 'Others 1', 'Assorted mystery box.', '2024-01-05 10:00:00', '2024-10-15 10:00:00', 20, 30, FALSE, 'used', 'uploads/bread.png'),
-(10, 2, 'Others 2', 'Surprise gift package.', '2024-02-15 11:00:00', '2024-11-10 11:00:00', 30, 50, FALSE, 'new', 'uploads/bread.png'),
-(10, 1, 'Others 3', 'DIY crafting kit.', '2024-03-10 12:00:00', '2025-01-15 12:00:00', 25, 35, TRUE, 'new', 'uploads/bread.png'),
-(10, 2, 'Others 4', 'Unique handmade keychains.', '2024-04-05 13:00:00', '2025-02-15 13:00:00', 10, 20, TRUE, 'good', 'uploads/bread.png'),
-(10, 1, 'Others 5', 'Travel accessories bundle.', '2024-05-20 14:00:00', '2025-01-18 14:00:00', 40, 60, TRUE, 'new', 'uploads/bread.png'),
-(10, 2, 'Others 6', 'Pet care items package.', '2024-06-25 15:00:00', '2025-03-01 15:00:00', 50, 70, TRUE, 'new', 'uploads/bread.png'),
-(10, 1, 'Others 7', 'Assorted household tools.', '2024-07-15 16:00:00', '2025-01-25 16:00:00', 35, 45, TRUE, 'used', 'uploads/bread.png'),
-(10, 2, 'Others 8', 'Mystery collector’s box.', '2024-08-22 17:00:00', '2025-01-30 17:00:00', 70, 100, TRUE, 'good', 'uploads/bread.png');
+(9, 2, 'Media 8', 'Collector’s edition comic book.', '2024-08-25 17:00:00', '2025-01-30 17:00:00', 120, 150, TRUE, 'new', 'uploads/bread.png');
 
 
 -- Insert Bids (linked to auctions and buyers)
