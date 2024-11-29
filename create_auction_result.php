@@ -27,7 +27,7 @@ if (!is_numeric($starting_price)) {
 $reserve_price = isset($_POST["auctionReservePrice"]) && is_numeric($_POST["auctionReservePrice"]) ? $_POST["auctionReservePrice"] : 0;
 
 $uploadDir = 'uploads/';
-$imagePath = 'uploads/bread.png';
+$imagePath = 'uploads/placeholder.png';
 
 if (isset($_FILES['auctionImage']) && $_FILES['auctionImage']['error'] == UPLOAD_ERR_OK) {
     if (!file_exists($uploadDir)) {
