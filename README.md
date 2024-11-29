@@ -1,5 +1,3 @@
-Here’s a comprehensive README.md file for your auction database project:
-
 # Auction Database Project
 
 ## Table of Contents
